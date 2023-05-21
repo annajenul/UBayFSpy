@@ -217,6 +217,11 @@ class UBaymodel():
         
     def train(self):
         
+        # check if any constraint present:
+        if len(self.constraints) == 0:
+            sys.exit("At least a max-size constraint must be present for training!")
+        
+        
         theta = self.posteriorExpectation()
         
         def neg_loss(state):
@@ -299,14 +304,14 @@ class UBaymodel():
         
         # always add feature set with best scores
         
-        ms = None
-        for en, i in enumerate(self.constraints):
-            if np.array_equal(i.block_matrix, np.identity(n)):
-                for j in range(len(i.A)):
-                    if np.array_equal(i.A[j,:], np.ones(len(i.A[j,:]))):
-                        ms = i.b[j]
+        ms = []
+        for i in self.constraints:
+            ms_c = i.get_maxsize()
+            if ms_c is not None:
+                ms.append(ms_c)
                 
-        if (len([ms]) == 1) and (ms > 0):
+        if (len(ms) == 1) and (ms[0] > 0):
+            ms = ms[0]
             ms_sel = (-post_scores).argsort()[:ms]
             add_x = np.zeros(x_start.shape[1])
             add_x[ms_sel] = 1
