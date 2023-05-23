@@ -15,6 +15,7 @@ import mrmr
 import sys
 from scipy.special import logsumexp
 from pygad import GA
+from pprint import pprint
 
 # import from own files
 from UBayFS_constraints import UBayconstraint
@@ -25,10 +26,10 @@ class UBaymodel():
     description
     """
     
-    def __init__(self, data, target, feat_names = [], M=5, tt_split=0.75, 
+    def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
                  nr_features="auto",
                  method=["mrmr"], prior_model="dirichlet", weights=[1], 
-                 constraints=None, l=1, optim_method="GA", popsize=10, maxiter=10):
+                 constraints=None, l=1, optim_method="GA", popsize=100, maxiter=100):
         
         
         self.data = pd.DataFrame(data)
@@ -155,12 +156,12 @@ class UBaymodel():
         
     def setWeights(self, weights, block_list=None, block_matrix=None):
         
-        if (len(weights) >1) or (len(weights) != self.ncol):
+        if (len(weights) >1) and (len(weights) != self.ncol):
             sys.exit("Error: length of prior weights does not match data matrix")
             
         
         if len(weights) == 1:
-            self.weights = np.repeat(weights, self.ncol)
+            weights = np.repeat(weights, self.ncol)
         
         if any(weights) <= 0:
             sys.exit("Error: weights must be positive")
@@ -172,12 +173,18 @@ class UBaymodel():
                 block_matrix[i,block_list[i]] = 1
             weights = np.matmul(np.transpose(block_matrix), weights.reshape(-1,1))
             
-        
-        if np.shape(block_matrix)[0] != len(weights):
-            sys.exit("Error: wrong length of weights vector: must match number of blocks, if block_matrix or block_list are provided")
+            if np.shape(block_matrix)[0] != len(weights):
+                sys.exit("Error: wrong length of weights vector: must match number of blocks, if block_matrix or block_list are provided")
+            self.weights = weights
+        else:
+            self.weights = weights
             
         self.block_matrix = block_matrix
-        self.weights = weights
+        
+    def getWeights(self):
+        return self.weights
+    
+    
                 
     def setOptim(self, method, popsize, maxiter):
         # check if method is empty
@@ -185,6 +192,8 @@ class UBaymodel():
         self.popsize = popsize
         self.maxiter = maxiter
         
+    def getOptim(self):
+        return {"method":self.method, "popsize":self.popsize, "maxiter":self.maxiter}
         
     def setConstraints(self, constraints, append=False):
         
@@ -192,9 +201,24 @@ class UBaymodel():
             sys.exit("Dimensions of constraints do not match")
         
         if append:
-            self.constraints = self.constraints + [constraints]
+            # check if block matrix already present
+            bm_appearance = [np.array_equal(constraints.block_matrix, i.block_matrix) for i in self.constraints]
+            if sum(bm_appearance) > 0:
+                index = int(np.where(bm_appearance)[0])
+                self.constraints[index].A = np.append(self.constraints[index].A, constraints.A, axis=0)
+                self.constraints[index].b = np.append(self.constraints[index].b, constraints.b)
+                self.constraints[index].rho = np.append(self.constraints[index].rho, constraints.rho)
+            else:
+                self.constraints = self.constraints + [constraints]
         else:
             self.constraints = [constraints]
+            
+    def getConstraints(self):
+        
+        constraints = {}
+        for i, constraint in enumerate(self.constraints):
+            constraints[i] = {"A":constraint.A, "b":constraint.b, "rho": constraint.rho, "block_matrix":constraint.block_matrix}
+        return constraints
             
         
     def admissibility(self, state, log=True):
@@ -265,10 +289,10 @@ class UBaymodel():
                     cum_num_constraints_per_block[i]
                 
                 if len(active_constraints_in_block) > 0:
-                    constraint_new = UBayconstraint(self.constraints[i].A[active_constraints_in_block,:],\
-                                                    self.constraints[i].b[active_constraints_in_block], \
-                                                        self.constraints[i].rho[active_constraints_in_block], \
-                                                            block_matrix=self.constraints[i].block_matrix)
+                    constraint_new = UBayconstraint(rho=self.constraints[i].rho[active_constraints_in_block],
+                                                    A=self.constraints[i].A[active_constraints_in_block,:],
+                                                    b=self.constraints[i].b[active_constraints_in_block],
+                                                    block_matrix=self.constraints[i].block_matrix)
                         
                     a = constraint_new.group_admissibility(state, log=log)
                     res = res + a if log else res * a
@@ -311,7 +335,7 @@ class UBaymodel():
                 ms.append(ms_c)
                 
         if (len(ms) == 1) and (ms[0] > 0):
-            ms = ms[0]
+            ms = int(ms[0])
             ms_sel = (-post_scores).argsort()[:ms]
             add_x = np.zeros(x_start.shape[1])
             add_x[ms_sel] = 1

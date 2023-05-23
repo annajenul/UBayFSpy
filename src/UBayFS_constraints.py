@@ -13,7 +13,9 @@ from sklearn.feature_selection import SelectKBest, chi2
 from skfeature.function.similarity_based import fisher_score
 from scipy.special import logsumexp
 import mrmr
+import math
 import sys
+from itertools import chain
 
 class UBayconstraint():
     
@@ -22,15 +24,14 @@ class UBayconstraint():
         
         direct_var_setting = (A is not None) and (b is not None)
         indirect_var_setting = (constraint_types is not None) and (constraint_vars is not None) and (num_elements is not None)
-        self.direct_var_setting = direct_var_setting
-        self.indirect_var_setting = indirect_var_setting
-        
+
         if direct_var_setting and indirect_var_setting:
             sys.exit("Constraints must be defined direnctly or indirectly but not both!")
         
+        rho_single = (len(rho) == 1)
         
-        if direct_var_setting:
-            if any(rho <=0):
+        if direct_var_setting == True:
+            if np.any(rho <=0):
                 sys.exit("rho values must be >0")
             
             if len(A) != len(b) != len(rho):
@@ -40,13 +41,18 @@ class UBayconstraint():
                 
             self.A = A
             self.b = b
-            self.rho = rho
             
+            if rho_single:
+                self.rho = np.repeat(rho, self.A.shape[0])
+            else:
+                self.rho = rho
             
         else:
             
             self.A = np.empty((0,num_elements), int)
             self.b = np.empty(0)
+            self.rho = np.empty(0)
+            
             # check if all constraint types in max, must, cannot
             
             # len constraint types must be len constraint vars
@@ -54,6 +60,7 @@ class UBayconstraint():
             def max_size(smax):
                 self.A = np.append(self.A, np.ones((1,num_elements)), axis=0)
                 self.b = np.append(self.b, smax)
+                
                 
             def must_link(sel):
                 if len(sel) > 1:
@@ -74,32 +81,45 @@ class UBayconstraint():
                     
             # iterate over constraints
             
-            for cv, ct in zip(constraint_vars, constraint_types):
+            for i, (cv, ct) in enumerate(zip(constraint_vars, constraint_types)):
                 if ct == "max_size":
                     max_size(cv)
+                    if rho_single:
+                        self.rho = np.append(self.rho, rho[0])
+                    else:
+                        self.rho = np.append(self.rho, rho[i])
                 elif ct == "must_link":
                     must_link(cv)
+                    N = len(cv)
+                    combinations = math.factorial(N) / math.factorial((N-2))
+                    if rho_single:
+                        self.rho = np.append(self.rho, np.repeat(rho[0],combinations))
+                    else:
+                        self.rho = np.append(self.rho, np.repeat(rho[i],combinations))
                 elif ct == "cannot_link":
                     cannot_link(cv)
+                    if rho_single:
+                        self.rho = np.append(self.rho, rho[0])
+                    else:
+                        self.rho = np.append(self.rho, rho[i])
                 else:
                     print("The constraint type '", ct, "' is unknown.")
 
-            if len(rho) == 1:
-                self.rho = np.repeat(rho, self.A.shape[0])
-                
+            
         if (block_matrix is None) and (block_list is None):
-            block_matrix = np.identity(np.shape(A)[1])
+            block_matrix = np.identity(np.shape(self.A)[1])
             self.block_matrix = block_matrix  
             
         elif (block_matrix is None) and (block_list is not None):
             
-            block_matrix = np.zeros((len(block_list), self.A.shape[1]))
+            block_matrix = np.zeros((len(block_list), (max(list(chain.from_iterable(block_list)))+1)))
             for i in range(len(block_list)):
                 block_matrix[i,block_list[i]] = 1
             self.block_matrix = block_matrix
         else:
             self.block_matrix = block_matrix
-               
+          
+        
                     
             
         

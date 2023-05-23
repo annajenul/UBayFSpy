@@ -36,13 +36,17 @@ rho = np.array([np.Inf, 0.5,np.Inf])
 state = np.array([1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
 state1 = np.array([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
 state2 = np.ones(20)
-c= UBayconstraint(A,b,rho)
-c2 = UBayconstraint(rho=np.array([2]), constraint_types=["max_size", "must_link", "cannot_link", "jjj"], constraint_vars=[3, [1,3], [4,5,6], [7]], num_elements=10)
-
+c= UBayconstraint(rho,A,b)
+c2 = UBayconstraint(rho=np.array([2]), constraint_types=["max_size", "must_link", "cannot_link", "jjj"], constraint_vars=[3, [1,3], [4,5,6], [7]], num_elements=20)
+c3 = UBayconstraint(rho=np.array([2]), constraint_types=["max_size", "must_link", "cannot_link", "jjj"], constraint_vars=[3, [1,3], [4,5,6], [7]], num_elements=20)
+c3.block_matrix[10,10] = 0
+c4 = UBayconstraint(rho=np.array([2]), constraint_types=["max_size", "must_link", "cannot_link", "jjj"], constraint_vars=[3, [1,8], [4,5,9], [7]], num_elements=20)
 
 a = UBaymodel(data, target)
 a.setConstraints(c)
 a.setConstraints(c2, append=True)
+a.setConstraints(c3, append=True)
+a.setConstraints(c4, append=True)
 a.sampleInitial(np.exp(a.posteriorExpectation()), 5)
 
 
