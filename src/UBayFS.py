@@ -347,8 +347,42 @@ class UBaymodel():
         return x_start
             
         
+    def evaluateFS(self, state, method="spearman", log=False):
+        
+        results = {}
+        # correlation
+        if np.sum(state) >1:
+            c = np.abs(self.data.iloc[:,state==1].corr(method=method)).values
+            average_feature_correlation = np.round((np.sum(c) - np.sum(np.diag(c))) / (np.sum(state) * (np.sum(state)-1)),3)
+        else:
+            c = None
+            average_feature_correlation = None
         
         
+        # posterior scores
+        post_scores = self.posteriorExpectation()
+        log_post = logsumexp(post_scores[state == 1])
+        
+        neg_loss = np.exp(logsumexp(np.array(post_scores[state==1] + [np.log(self.l) + self.admissibility(state)]))) - \
+            self.l
+        if log:
+            neg_loss = np.log(neg_loss)
+            
+        # calculate number of violated constraints
+        num_violated_constraints = 0
+        for constraint in self.constraints:
+            num_violated_constraints +=  \
+            np.sum(np.matmul(constraint.A, np.matmul(constraint.block_matrix, state)>0) > constraint.b)
+            
+        # calculate output metrics
+        results["cardinality"] = np.sum(state)
+        results["total utility"] = np.round(neg_loss,3)
+        results["posterior feature utility"] = np.round(log_post, 3) if log else np.round(np.exp(log_post),3)
+        results["admissibility"] = np.round(self.admissibility(state,log=log),3)
+        results["number of violated constraints"] = num_violated_constraints
+        results["average feature correlation"] = average_feature_correlation
+        
+        return results
                    
                 
                     

@@ -118,11 +118,7 @@ class UBayconstraint():
             self.block_matrix = block_matrix
         else:
             self.block_matrix = block_matrix
-          
-        
-                    
-            
-        
+         
         
     def get_dimensions(self):
         return np.array([np.shape(self.A)[0], np.shape(self.block_matrix)[1]])
