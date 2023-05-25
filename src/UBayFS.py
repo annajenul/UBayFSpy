@@ -18,12 +18,32 @@ from pygad import GA
 from pprint import pprint
 
 # import from own files
-from UBayFS_constraints import UBayconstraint
+from src.UBayFS_constraints import UBayconstraint
 
 
 class UBaymodel():
     """
-    description
+    The constructor initializes common variables of UBaymodel.
+    
+    PARAMETERS
+    -----
+    data: <numpy array> or <pandas dataframe>
+        Dataset on which feature selection shall be performed. 
+        Variable types must be numeric or integer.
+    target: <numpy array> or <pandas dataframe>
+        Response variable of data.
+    feat_names : <list>
+        List holding feature names. Preferably a list of string values. 
+        If empty, feature names will be generated automatically. 
+        Default: ``feat_names=[]``.
+    M : <int>
+        Number of unique train-test splits. Default ``K=100``.
+    tt_split : <float>
+        traint test split. Default ``tt_split=0.75``.
+    nr_features : <string or int>
+        Set a random state to reproduce your results. Default: ``string="auto"``.
+            - ``string="auto"`` : .... 
+            - ``int`` : ....       
     """
     
     def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
