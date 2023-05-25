@@ -39,7 +39,7 @@ class UBayconstraint():
     nr_features : <string or int>
         Set a random state to reproduce your results. Default: ``string="auto"``.
             - ``string="auto"`` : .... 
-            - ``int`` : ....       
+            - ``int`` : 10       
     """
     
     def __init__(self, rho, A=None, b=None, block_matrix=None, block_list=None,
