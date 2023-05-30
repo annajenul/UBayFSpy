@@ -43,7 +43,7 @@ class UBaymodel():
     nr_features : <string or int>
         Set a random state to reproduce your results. Default: ``string="auto"``.
             - ``string="auto"`` : .... 
-            - ``int`` : ....       
+            - ``int`` : .       
     """
     
     def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
