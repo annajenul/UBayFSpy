@@ -18,7 +18,7 @@ from pygad import GA
 
 
 # import from own files
-from src.UBayFSpy.UBayconstraint import UBayconstraint
+from UBayconstraint import UBayconstraint
 
 
 class UBaymodel():
