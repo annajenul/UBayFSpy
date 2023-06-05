@@ -3,5 +3,5 @@ UBaymodel
 
 UBayFS 
 
-.. autoclass:: UBayFS.UBaymodel
+.. autoclass:: UBaymodel.UBaymodel
     :members:

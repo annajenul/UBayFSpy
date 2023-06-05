@@ -11,7 +11,7 @@ Welcome to UBayFS's documentation!
    :caption: Contents:
 
    UBaymodel
-   UBayFS_constraints
+   UBayconstraint
 
 
 

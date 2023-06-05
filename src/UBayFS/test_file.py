@@ -8,8 +8,8 @@ Created on Sun May 14 13:43:37 2023
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification, make_regression
-from UBayFS import UBaymodel
-from UBayFS_constraints import UBayconstraint
+from UBaymodel import UBaymodel
+from UBayconstraint import UBayconstraint
 data, target = make_classification(random_state=1,  n_features=20)
 #data = np.c_[ data, np.ones(100) ]  
 #data = data +100

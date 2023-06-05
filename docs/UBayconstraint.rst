@@ -3,5 +3,5 @@ UBay constraints
 
 UBayFS 
 
-.. autoclass:: UBayFS_constraints.UBayconstraint
+.. autoclass:: UBayconstraint.UBayconstraint
     :members:
