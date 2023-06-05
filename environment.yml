@@ -1,0 +1,21 @@
+name: coderefinery
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+dependencies:
+  - python>3.7
+  - numpy=1.20.2
+  - pandas=1.2.4
+  - sphinx=3.5.4
+  - sphinx_rtd_theme=0.5.2
+  - scikit-learn
+  - sklearn-features
+  - mrmr
+  - sys
+  - scipy
+  - pygad
+  - random
+  - pip
+#  - pip:
+#    - jupyterlab-github==2.0.0
