@@ -15,7 +15,7 @@ import mrmr
 import sys
 from scipy.special import logsumexp
 from pygad import GA
-from pprint import pprint
+
 
 # import from own files
 from src.UBayFS_constraints import UBayconstraint

@@ -11,6 +11,14 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme
+          pip install numpy
+          pip install pandas
+          pip install scikit-learn
+          pip install sklearn-features
+          pip install mrmr
+          pip install scipy
+          pip installl random
+          pip install pygad
       - name: Sphinx build
         run: |
           sphinx-build docs _build
