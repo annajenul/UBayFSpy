@@ -23,7 +23,7 @@ from UBayFS.UBayconstraint import UBayconstraint
 
 class UBaymodel():
     """
-    Initialization of a UBaymodel
+    Initialization of a UBaymodel.
     
     PARAMETERS
     -----
@@ -64,7 +64,6 @@ class UBaymodel():
         Positive integer for the population size in GA.
     maxiter : <integer>
         Positive integer for the maximal number of GA iterations.
-
     """
     
     def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
