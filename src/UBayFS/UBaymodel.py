@@ -350,7 +350,14 @@ class UBaymodel():
         
         
     def train(self):
-        
+        """
+        Train the UBaymodel.
+           
+        Returns
+        -----
+        - <pandas dataframe> with the optimal feature set and their names as index
+        - <list> of selected feature names
+        """
         # check if any constraint present:
         if len(self.constraints) == 0:
             sys.exit("At least a max-size constraint must be present for training!")
@@ -380,7 +387,13 @@ class UBaymodel():
         return  pd.DataFrame(x_optim, index=self.feat_names), list(np.array(self.feat_names)[np.where(x_optim ==1)[0]])
         
     def sampleInitial(self, post_scores, size):
-        
+        """
+        Sample an initial feature set based on a search heuristic.
+           
+        Returns
+        -----
+        A binary <numpy array> feature set.
+        """
         n = len(post_scores)
         num_constraints_per_block = [const.get_dimensions()[0] for const in self.constraints]
         cum_num_constraints_per_block = np.array([0] + list(np.cumsum(num_constraints_per_block)))
@@ -458,7 +471,13 @@ class UBaymodel():
             
         
     def evaluateFS(self, state, method="spearman", log=False):
-        
+        """
+        Train the UBaymodel.
+           
+        Returns
+        -----
+        A <dictionary> with different key parameters of the selected feature set.
+        """
         results = {}
         # correlation
         if np.sum(state) >1:
