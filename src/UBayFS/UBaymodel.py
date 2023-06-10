@@ -18,12 +18,12 @@ from pygad import GA
 
 
 # import from own files
-from UBayconstraint import UBayconstraint
+from UBayFS.UBayconstraint import UBayconstraint
 
 
 class UBaymodel():
     """
-    The constructor initializes common variables of UBaymodel.
+    Initialization of a UBaymodel
     
     PARAMETERS
     -----
@@ -32,18 +32,39 @@ class UBaymodel():
         Variable types must be numeric or integer.
     target: <numpy array> or <pandas dataframe>
         Response variable of data.
+        Variable types must be numeric or integer.
     feat_names : <list>
         List holding feature names. Preferably a list of string values. 
         If empty, feature names will be generated automatically. 
         Default: ``feat_names=[]``.
     M : <int>
-        Number of unique train-test splits. Default ``K=100``.
+        Positive integer determining the number of ensemble models. Default ``M=100``.
     tt_split : <float>
-        traint test split. Default ``tt_split=0.75``.
+        Ratio of samples used for training a single ensemble model. Default ``tt_split=0.75``.
     nr_features : <string or int>
-        Set a random state to reproduce your results. Default: ``string="auto"``.
-            - ``string="auto"`` : .... 
-            - ``int`` : .       
+        Number of features selected in a single ensemble. Default: ``nr_features="auto"``.
+            - ``string="auto"`` : A random number between 1 and the total number of features. 
+            - ``int`` : A positive integer.
+    method : <list of strings>
+        List of feature selectors used as ensemble feature selectors.Currently options are:
+            - ``mrmr`` : minimum Redundancy maximal Relevance criterion. This method supports classification and regression tasks.
+            - ``chi`` : chi square whatever
+            - ``fisher`` : Fisher score (classification only)
+    prior_model : <string>
+        Type of prior. Default: ``prior_model="dirichlet"``. So far, "dirichlet" is the only implemented prior model type.
+    weights : <list>
+        A list of integers defining the prior weights of the features. If a list with only one entry is used, this value is assigned to each feature as prior weight.
+    constraints: <UBayconstraint>
+        A UBayconstraint object describing user-defined constraints. See description UBayconstraint. Default: ``weight=[1]``
+    l : <float>
+        Positive float. The Lagrange parameter defining the penalization strength imposed on a feature set violating the constraints. Default: ``l=1``
+    optim_method : <string>
+        Optimizer. Currently only Genetic Algorithm "GA" available. Default: ``optim_metod="GA"``
+    popsize : <integer>
+        Positive integer for the population size in GA.
+    maxiter : <integer>
+        Positive integer for the maximal number of GA iterations.
+
     """
     
     def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
@@ -53,7 +74,7 @@ class UBaymodel():
         
         
         self.data = pd.DataFrame(data)
-        self.target = target
+        self.target = target.values if isinstance(target, pd.DataFrame) else target
         self.M = M
         self.tt_split = tt_split
         self.method = method
