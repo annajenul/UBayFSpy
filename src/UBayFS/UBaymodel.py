@@ -201,8 +201,7 @@ class UBaymodel():
         PARAMETERS
         -----
         weights : <list>
-            A list of integers defining the prior weights of the features. If a list with only one entry is used, this value is assigned to each feature as prior weight. Default: ``weight=[1]``.
-        block_list : <list>
+            A list of integers defining the prior weights of the features. If a list with only one entry is used, this value is assigned to each feature as prior weight.
             Block assignment information for features.
         block_matrix : <np.array>
             Numpy array matrix definint the block assignment information for features. 
@@ -245,16 +244,45 @@ class UBaymodel():
     
                 
     def setOptim(self, method, popsize, maxiter):
+        """
+        Set parameters for optimization.
+    
+        PARAMETERS
+        -----
+        method : <string>
+            Currently only genetic algorithm ("GA") possible.
+        popsize : <integer>
+            Positive integer for the population size in GA.
+        maxiter : <integer>
+            Positive integer for the maximal number of GA iterations.     
+        """
         # check if method is empty
-        self.method = method
+        self.optim_method = optim_method
         self.popsize = popsize
         self.maxiter = maxiter
         
     def getOptim(self):
-        return {"method":self.method, "popsize":self.popsize, "maxiter":self.maxiter}
+        """
+        Get optimization parameters.
+    
+        Returns
+        -----
+        A dictionary with the optimization parameters.
+        """
+        return {"optim_method":self.optim_method, "popsize":self.popsize, "maxiter":self.maxiter}
         
     def setConstraints(self, constraints, append=False):
-        
+        """
+        Set side oconstraints.
+
+        PARAMETERS
+        -----
+        constraints: <UBayconstraint>
+            A UBayconstraint object describing user-defined constraints. See description UBayconstraint.
+        append : <boolean>
+            - True: Append a new constraint to the list of present constraints 
+            - False: Replace all present constraints with the new constraint
+        """
         if constraints.get_dimensions()[1] != self.ncol:
             sys.exit("Dimensions of constraints do not match")
         
@@ -272,7 +300,13 @@ class UBaymodel():
             self.constraints = [constraints]
             
     def getConstraints(self):
-        
+        """
+        Get side constraints.
+    
+        Returns
+        -----
+        A list.
+        """
         constraints = {}
         for i, constraint in enumerate(self.constraints):
             constraints[i] = {"A":constraint.A, "b":constraint.b, "rho": constraint.rho, "block_matrix":constraint.block_matrix}
@@ -280,7 +314,19 @@ class UBaymodel():
             
         
     def admissibility(self, state, log=True):
-        
+        """
+        Get admissibility of a feature set.
+        PARAMETERS
+        -----
+        state : <np.array>
+            Binary 1-d array indicating which features are selected (1) and which are not selected (0).
+        log : <boolean>
+            Use of log-scale.
+    
+        Returns
+        -----
+        A numeric value.
+        """
         adm = 1-log
 
         for i in self.constraints:
