@@ -23,7 +23,7 @@ from UBayFS.UBayconstraint import UBayconstraint
 
 class UBaymodel():
     """
-    Initialization of a UBaymodel.
+    The constructor initializes common variables of UBaymodel.
     
     PARAMETERS
     -----
@@ -32,13 +32,18 @@ class UBaymodel():
         Variable types must be numeric or integer.
     target: <numpy array> or <pandas dataframe>
         Response variable of data.
-        Variable types must be numeric or integer.
     feat_names : <list>
         List holding feature names. Preferably a list of string values. 
         If empty, feature names will be generated automatically. 
         Default: ``feat_names=[]``.
     M : <int>
-        Positive integer determining the number of ensemble models. Default ``M=100``.
+        Number of unique train-test splits. Default ``K=100``.
+    tt_split : <float>
+        traint test split. Default ``tt_split=0.75``.
+    nr_features : <string or int>
+        Set a random state to reproduce your results. Default: ``string="auto"``.
+            - ``string="auto"`` : .... 
+            - ``int`` : ...      
     """
     
     def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
