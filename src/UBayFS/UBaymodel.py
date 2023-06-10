@@ -337,7 +337,13 @@ class UBaymodel():
         return adm
         
     def posteriorExpectation(self):
-        
+        """
+        Posterior expectation score.
+           
+        Returns
+        -----
+        A numeric value.
+        """
         post_scores = self.counts.values.astype(int) + self.weights
         post_scores = np.log(post_scores) - np.log(np.sum(post_scores))
         return post_scores
