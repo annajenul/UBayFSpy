@@ -19,27 +19,29 @@ from itertools import chain
 
 class UBayconstraint():
     """
-    The constructor initializes common variables of UBaymodel.
+    This class initializes user-defined constraints.
     
     PARAMETERS
     -----
-    data: <numpy array> or <pandas dataframe>
-        Dataset on which feature selection shall be performed. 
-        Variable types must be numeric or integer.
-    target: <numpy array> or <pandas dataframe>
-        Response variable of data.
-    feat_names : <list>
-        List holding feature names. Preferably a list of string values. 
-        If empty, feature names will be generated automatically. 
-        Default: ``feat_names=[]``.
-    M : <int>
-        Number of unique train-test splits. Default ``K=100``.
-    tt_split : <float>
-        traint test split. Default ``tt_split=0.75``.
-    nr_features : <string or int>
-        Set a random state to reproduce your results. Default: ``string="auto"``.
-            - ``string="auto"`` : .... 
-            - ``int`` : 5     
+    rho: <numpy array> 
+        Vector of regularization strenghts for the defined constraints.
+    A: <numpy array> 
+        Matrix describing constraints. Left side of the equation system. Default: ``A=None``
+    b : <numpy array>
+        1-d dimensional array defining the right sight of the equation system. Default: ``b=None``
+    block_matrix : <numpy array>
+        Matrix describing the block assignment for each feature. If no block-structure given, block_matrix is a diagonal-unity matrix. Default : ``block_matrix=None``.
+    block_list : <list>
+        List describing the block assignment for each feature, if block structure is present. Default : ``block_list=None``.
+    constraint_types : <list> of <strings>
+        Constraint types. Possible options are:
+            - "max_size" : maximal number of features that shall be selected 
+            - "must_link" : the defined feature set must be selected together
+            - "cannot_link" : the defined feature set must not be selected together  
+    constraint_vars : <list> of <int> or <lists>
+        For each constraint_type, define features sets that are concerned. Default : ```constraint_vars=None``.
+    num_elements : <int>
+        Total number of features. Default :``num_elements=None``. 
     """
     
     def __init__(self, rho, A=None, b=None, block_matrix=None, block_list=None,
