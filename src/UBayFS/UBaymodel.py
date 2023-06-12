@@ -243,13 +243,13 @@ class UBaymodel():
     
     
                 
-    def setOptim(self, method, popsize, maxiter):
+    def setOptim(self, optim_method, popsize, maxiter):
         """
         Set parameters for optimization.
     
         PARAMETERS
         -----
-        method : <string>
+        optim_method : <string>
             Currently only genetic algorithm ("GA") possible.
         popsize : <integer>
             Positive integer for the population size in GA.

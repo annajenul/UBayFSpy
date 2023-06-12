@@ -146,10 +146,30 @@ class UBayconstraint():
          
         
     def get_dimensions(self):
+        """
+        Get the dimensions of ...?
+           
+        Returns
+        -----
+        ...
+        """
         return np.array([np.shape(self.A)[0], np.shape(self.block_matrix)[1]])
         
     def group_admissibility(self, state, log=True):
+        """
+        Evaluate the value of the admissibility function 'kappa' for a group of constraints (with a common block)-
+
+        PARAMETERS
+        -----
+        state: <np.array>
+            1-dimensional binary array describing a feature set. 1: feature selected, 0: feature not selected.
+        log : <boolean>
+            Indicates whether the admissibility should be returned on log scale.
         
+        Returns
+        -----
+        An admissibility value <float>.
+        """
         if not len(state) == self.get_dimensions()[1]:
             sys.exit("Wrong size of state!")
             
@@ -184,6 +204,13 @@ class UBayconstraint():
             return np.exp(lprob1 + lprob2)
     
     def get_maxsize(self):
+        """
+        Get the right side (b) of the max size constraint.
+        
+        Returns
+        -----
+        An integer.
+        """
         ms = None
         
         if np.array_equal(self.block_matrix, np.identity(np.shape(self.A)[1])):
