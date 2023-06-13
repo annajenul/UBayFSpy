@@ -12,7 +12,6 @@ from random import sample
 from sklearn.feature_selection import SelectKBest, chi2
 from skfeature.function.similarity_based import fisher_score
 from scipy.special import logsumexp
-import mrmr
 import math
 import sys
 from itertools import chain

@@ -8,7 +8,7 @@ Created on Fri May 12 11:55:40 2023
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from random import sample
+from random import sample, seed
 from sklearn.feature_selection import SelectKBest, chi2
 from skfeature.function.similarity_based import fisher_score
 import mrmr
@@ -69,7 +69,8 @@ class UBaymodel():
     def __init__(self, data, target, feat_names = [], M=100, tt_split=0.75, 
                  nr_features="auto",
                  method=["mrmr"], prior_model="dirichlet", weights=[1], 
-                 constraints=None, l=1, optim_method="GA", popsize=100, maxiter=100):
+                 constraints=None, l=1, optim_method="GA", popsize=100, maxiter=100,
+                 random_state=None):
         
         
         self.data = pd.DataFrame(data)
@@ -83,6 +84,7 @@ class UBaymodel():
         self.optim_method = optim_method
         self.popsize = popsize
         self.maxiter = maxiter
+        self.random_state = random_state
         
         
         if constraints is None:
@@ -129,20 +131,28 @@ class UBaymodel():
         for i in range(self.M):
             if self.binary == True:
                 train_data, test_data,train_labels, test_labels = train_test_split(data, target, 
-                                                           train_size=self.tt_split, stratify=target)
+                                                           train_size=self.tt_split, stratify=target, random_state=self.random_state)
+                
             else:
                 train_data, test_data,train_labels, test_labels = train_test_split(data, target, 
-                                                           train_size=self.tt_split)
+                                                           train_size=self.tt_split, random_state=self.random_state)
             # non constant columns
             nconst_cols = np.where(train_data.nunique() != 1)[0]
             train_data = train_data.iloc[:,nconst_cols]
             
             # number of features
             if nr_features == "auto":
+                seed(self.random_state)
                 self.nr_features = sample(list(np.arange(1,self.ncol)),1)[0]
             else:
                 self.nr_features = nr_features
                 
+
+            train_data = train_data.values
+            if self.binary:
+                train_labels = train_labels.values[:,0].astype(int)
+            else:
+                train_labels = train_labels.values[:,0].astype(float)
                 
             for m in self.method:
                 
@@ -150,10 +160,11 @@ class UBaymodel():
                 
                     if m in ["mRMR", "mrmr"]:
                         if self.binary:
-                            ranks = mrmr.mrmr_classif(train_data, train_labels, 
+                            ranks = mrmr.mrmr_classif(pd.DataFrame(train_data), train_labels, 
                                                       self.nr_features)
+                            ranks = [self.feat_names[i] for i in ranks]
                         else:
-                            ranks = mrmr.mrmr_regression(train_data, train_labels, 
+                            ranks = mrmr.mrmr_regression(pd.DataFrame(train_data), train_labels, 
                                                       self.nr_features)
                         name="mrmr"
                         
@@ -164,7 +175,7 @@ class UBaymodel():
                         name="chi"
                     if m in["fisher", "Fisher"]:
                         if self.binary:
-                            ranks = fisher_score.fisher_score(train_data.values, 
+                            ranks = fisher_score.fisher_score(train_data, 
                                                               train_labels)[:self.nr_features]
                             ranks = [self.feat_names[i] for i in ranks]
                             name="fisher"
@@ -184,7 +195,7 @@ class UBaymodel():
                 
                 self.ensemble_matrix = pd.concat([self.ensemble_matrix,
                                                   vec], ignore_index=False)
-        
+
         self.ensemble_matrix = self.ensemble_matrix.dropna()
         
         if np.ceil(len(self.ensemble_matrix) / len(self.method)) < np.ceil(self.M / 2):
@@ -378,7 +389,8 @@ class UBaymodel():
                    initial_population = x_start,
                    gene_type=int,
                    init_range_high=1,
-                   init_range_low=0
+                   init_range_low=0,
+                   random_seed=self.random_state
                    )
         
         x_optim, x_optim_fitness, _ = ga_instance.best_solution()
@@ -441,7 +453,8 @@ class UBaymodel():
         
         # apply along feature_orders
         
-        feature_orders = [] 
+        feature_orders = []
+        seed(self.random_state) 
         for i in range((size)):
             feature_orders.append(np.random.choice(range(self.ncol), size=self.ncol, replace=False, p=post_scores))
     
