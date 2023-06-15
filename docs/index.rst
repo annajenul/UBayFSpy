@@ -10,7 +10,7 @@ Welcome to UBayFS's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   Quickstart
+   quickstart
    UBaymodel
    UBayconstraint
 
