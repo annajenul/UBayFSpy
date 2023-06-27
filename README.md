@@ -2,4 +2,4 @@
 UbayFS in python
 
 Documentation:
-https://annajenul.github.io/UbayFSpy/
+https://annajenul.github.io/UBayFSpy/
