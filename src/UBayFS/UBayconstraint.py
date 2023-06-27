@@ -218,5 +218,13 @@ class UBayconstraint():
                     ms = self.b[j]
         return ms
         
-           
+    def get_constraints(self):
+        """
+        Get the constraints.
+        
+        Returns
+        -----
+        A dictionary including A, b, and block_matrix.
+        """
+        return {"A":self.A, "b": self.b, "rho": self.rho, "block_matrix": self.block_matrix}
        

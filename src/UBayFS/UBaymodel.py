@@ -74,23 +74,21 @@ class UBaymodel():
         
         
         self.data = pd.DataFrame(data)
+        self.nrow, self.ncol = np.shape(data)
         self.target = target.values if isinstance(target, pd.DataFrame) else target
         self.M = M
         self.tt_split = tt_split
         self.method = method
         self.prior_model = prior_model
-        self.weights = weights
         self.l = l
-        self.optim_method = optim_method
-        self.popsize = popsize
-        self.maxiter = maxiter
         self.random_state = random_state
+        self.constraints = []
+        self.setWeights(weights)
+        self.setOptim(optim_method, popsize, maxiter)
         
         
-        if constraints is None:
-            self.constraints = []
-        else:
-            self.constraints = constraints
+        if constraints is not None:
+            self.setConstraints(constraints, append=True)
         
         # catch errors
         if self.data.isnull().values.any():
@@ -111,34 +109,29 @@ class UBaymodel():
             
         # binary classification or regression
         self.binary = np.array_equal(self.target, self.target.astype(bool))
+    
         
-        # other useful variables
-        self.nrow, self.ncol = np.shape(data)
         
         if len(feat_names) == 0:
             self.feat_names = ['f' + str(ind) for ind in range(self.ncol)]
         else:
             self.feat_names = feat_names
-        
         self.data.columns = self.feat_names
-        
-        if len(self.weights) == 1:
-            self.weights = np.repeat(self.weights, self.ncol)
-        
         self.ensemble_matrix = pd.DataFrame(columns=self.feat_names)
-        #method_names = method[!fs_vs_string]
         
         for i in range(self.M):
             if self.binary == True:
-                train_data, test_data,train_labels, test_labels = train_test_split(data, target, 
+                train_data, _, train_labels, _ = train_test_split(self.data, self.target, 
                                                            train_size=self.tt_split, stratify=target, random_state=self.random_state)
                 
             else:
-                train_data, test_data,train_labels, test_labels = train_test_split(data, target, 
+                train_data, _, train_labels, _ = train_test_split(self.data, self.target, 
                                                            train_size=self.tt_split, random_state=self.random_state)
             # non constant columns
             nconst_cols = np.where(train_data.nunique() != 1)[0]
+            self.nconst_cols = nconst_cols
             train_data = train_data.iloc[:,nconst_cols]
+            self.nconst_feature_names = [self.feat_names[i] for i in nconst_cols]
             
             # number of features
             if nr_features == "auto":
@@ -150,22 +143,23 @@ class UBaymodel():
 
             train_data = train_data.values
             if self.binary:
-                train_labels = train_labels.values[:,0].astype(int)
+                train_labels = train_labels[:,0].astype(int)
             else:
-                train_labels = train_labels.values[:,0].astype(float)
+                train_labels = train_labels[:,0].astype(float)
                 
             for m in self.method:
-                
+                self.ensemble_fails = 0
                 try:
                 
                     if m in ["mRMR", "mrmr"]:
                         if self.binary:
                             ranks = mrmr.mrmr_classif(pd.DataFrame(train_data), train_labels, 
-                                                      self.nr_features)
-                            ranks = [self.feat_names[i] for i in ranks]
+                                                      self.nr_features, show_progress=False)
+                            
                         else:
                             ranks = mrmr.mrmr_regression(pd.DataFrame(train_data), train_labels, 
-                                                      self.nr_features)
+                                                      self.nr_features, show_progress=True)
+                        ranks = [self.nconst_feature_names[i] for i in ranks]
                         name="mrmr"
                         
                     if m in ["chi"]:
@@ -175,9 +169,14 @@ class UBaymodel():
                         name="chi"
                     if m in["fisher", "Fisher"]:
                         if self.binary:
+                            self.td = train_data
+                            self.tl = train_labels
                             ranks = fisher_score.fisher_score(train_data, 
-                                                              train_labels)[:self.nr_features]
-                            ranks = [self.feat_names[i] for i in ranks]
+                                                              train_labels)
+                            self.ranks = ranks
+                            ranks = ranks[:self.nr_features]
+                            ranks = [self.nconst_feature_names[i] for i in ranks]
+                            
                             name="fisher"
                         else:
                             sys.exit("Fisher score not usable for regression problems!")
@@ -186,17 +185,19 @@ class UBaymodel():
                     vec.loc[0] = np.repeat(0, self.ncol)
                     vec.loc[:,ranks] = 1
                     vec.index = [name + "_" + str(i)]
+                    self.ensemble_matrix = pd.concat([self.ensemble_matrix,
+                                                  vec], ignore_index=False)
                 except:
                     print("method not working for in this iteration...")
-                    vec = pd.DataFrame(columns=self.feat_names)
-                    vec.loc[0] = np.repeat(np.nan, self.ncol)
-                    print(name + "_" + str(i))
-                    vec.index = [name + "_" + str(i)]
+                    #vec = pd.DataFrame(columns=self.feat_names)
+                    #vec.loc[0] = np.repeat(np.nan, self.ncol)
+                    #print(name + "_" + str(i))
+                    #vec.index = [name + "_" + str(i)]
+                    self.ensemble_fails += 1
                 
-                self.ensemble_matrix = pd.concat([self.ensemble_matrix,
-                                                  vec], ignore_index=False)
+                
 
-        self.ensemble_matrix = self.ensemble_matrix.dropna()
+        #self.ensemble_matrix = self.ensemble_matrix.dropna()
         
         if np.ceil(len(self.ensemble_matrix) / len(self.method)) < np.ceil(self.M / 2):
             sys.exit("Too many ensembles could not be performed!")
@@ -318,11 +319,11 @@ class UBaymodel():
         -----
         A list.
         """
-        constraints = {}
-        for i, constraint in enumerate(self.constraints):
-            constraints[i] = {"A":constraint.A, "b":constraint.b, "rho": constraint.rho, "block_matrix":constraint.block_matrix}
-        return constraints
-            
+        #constraints = {}
+        #for i, constraint in enumerate(self.constraints):
+        #    constraints[i] = {"A":constraint.A, "b":constraint.b, "rho": constraint.rho, "block_matrix":constraint.block_matrix}
+        #return constraints
+        return self.constraints    
         
     def admissibility(self, state, log=True):
         """
@@ -376,11 +377,8 @@ class UBaymodel():
         
         theta = self.posteriorExpectation()
         
-        def neg_loss(state):
-            return logsumexp(np.array(theta[state==1] + [np.log(self.l) + self.admissibility(state)]))
-        
         def fitness_fun(ga_instance, solution, solution_idx):
-            return neg_loss(solution)
+            return logsumexp(np.array(theta[solution==1] + [np.log(self.l) + self.admissibility(solution)]))
         
         x_start = self.sampleInitial(post_scores = np.exp(theta), size=self.popsize)
         ga_instance = GA(num_generations = self.maxiter,
