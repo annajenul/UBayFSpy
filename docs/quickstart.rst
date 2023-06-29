@@ -13,7 +13,7 @@ UBayFS can be used for common feature selection and also for block feature selec
 
 Documentation
 -------------
-The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UbayFSpy/blob/main/examples/classification%20example.ipynb>`_ , illustrating the UBayFS workflow. 
+The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UbayFSpy/blob/main/examples/UBayFS.ipynb>`_ , illustrating the UBayFS workflow. 
 
 Classification example
 ----------------------
@@ -43,7 +43,7 @@ example notebooks on the UBayFS GitHub repository.
                  nr_features = 20)
 
     constraints = UBayconstraint(rho=np.array([np.Inf, 0.1, 1, 1]), 
-                             constraint_types=["max_size", "must_link", "cannot_link", "cannot_link","jjj"], 
+                             constraint_types=["max_size", "must_link", "cannot_link", "cannot_link"], 
                              constraint_vars=[10, [0,10,20], [0,9], [19,22,23]], 
                              num_elements=data.shape[1])
     model.setConstraints(constraints)
