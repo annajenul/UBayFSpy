@@ -13,7 +13,7 @@ Welcome to UBayFS's documentation!
    quickstart
    UBaymodel
    UBayconstraint
-   ../examples/UBayFS
+   examples/UBayFS
 
 
 Indices and tables
