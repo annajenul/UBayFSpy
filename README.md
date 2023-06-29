@@ -44,36 +44,13 @@ Contributing
 ------------
 Your contribution to UBayFS is very welcome! 
 
-Contribution to the package requires the agreement of the [Contributor Code of Conduct](https://github.com/annajenul/UBayFS/blob/master/CODE_OF_CONDUCT.md) terms.
+Contribution to the package requires the agreement of the [Contributor Code of Conduct](https://github.com/annajenul/UBayFSpy/blob/main/CODE_OF_CONDUCT.md) terms.
 
-For the implementation of a new feature or bug-fixing, we encourage you to send a Pull Request to [the repository](https://github.com/annajenul/UBayFS). Please add a detailed and concise description of the invented feature or the bug. In case of fixing a bug, include comments about your solution. To improve UBayFS even more, feel free to send us issues with bugs, you are not sure about. We are thankful for any kind of constructive criticism and suggestions.
+For the implementation of a new feature or bug-fixing, we encourage you to send a Pull Request to [the repository](https://github.com/annajenul/UBayFSpy). Please add a detailed and concise description of the invented feature or the bug. In case of fixing a bug, include comments about your solution. To improve UBayFS even more, feel free to send us issues with bugs, you are not sure about. We are thankful for any kind of constructive criticism and suggestions.
 
 Citation
 ------------
-If you use UBayFS in a report or scientific publication, we would appreciate citations to the following papers:
-
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.04848/status.svg)](https://doi.org/10.21105/joss.04848)
-
-
-Jenul, A. and Schrunner, S., (2023). UBayFS: An R Package for User Guided Feature Selection. Journal of Open Source Software, 8(81), 4848, https://doi.org/10.21105/joss.04848
-
-Bibtex entry:
-
-	@article{Jenul2023,
-	  doi = {10.21105/joss.04848},
-	  url = {https://doi.org/10.21105/joss.04848},
-	  year = {2023},
-	  month = jan,
-	  publisher = {The Open Journal},
-	  volume = {8},
-	  number = {81},
-	  pages = {4848},
-	  author = {Anna Jenul and Stefan Schrunner},
-	  title = {{UBayFS}: An R Package for User Guided Feature
-			Selection},
-	  journal = {Journal of Open Source Software}
-	}
-
+If you use UBayFS in a report or scientific publication, we would appreciate citations to the following paper
 Jenul, A., Schrunner, S. et al. A user-guided Bayesian framework for ensemble feature selection in life science applications (UBayFS). Mach Learn (2022). https://doi.org/10.1007/s10994-022-06221-9
 
 Bibtex entry:
