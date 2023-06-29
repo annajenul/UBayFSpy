@@ -1,8 +1,7 @@
 Quickstart
 ==========
 
-The UBayFS package implements the framework proposed in the article [Jenul et al. (2022)](https://link.springer.com/article/10.1007/s10994-022-06221-9), 
-together with an interactive Shiny dashboard, which makes UBayFS applicable to R-users with different levels of expertise. UBayFS is an ensemble feature selection technique 
+The UBayFSpy package implements the framework proposed in the article [Jenul et al. (2022)](https://link.springer.com/article/10.1007/s10994-022-06221-9). UBayFS is an ensemble feature selection technique 
 embedded in a Bayesian statistical framework. The method combines data and user knowledge, where the first is extracted via data-driven ensemble feature selection. 
 The user can control the feature selection by assigning prior weights to features and penalizing specific feature combinations. 
 In particular, the user can define a maximal number of selected features and must-link constraints (features must be selected together) or 
@@ -13,7 +12,7 @@ UBayFS can be used for common feature selection and also for block feature selec
 
 Documentation
 -------------
-The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UbayFSpy/blob/main/examples/UBayFS.ipynb>`_ , illustrating the UBayFS workflow. 
+The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UBayFSpy/blob/main/examples/UBayFS.ipynb>`_ , illustrating the UBayFS workflow. 
 
 Classification example
 ----------------------
