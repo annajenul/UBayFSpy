@@ -13,7 +13,7 @@ Welcome to UBayFS's documentation!
    quickstart
    UBaymodel
    UBayconstraint
-   UBayFS
+   examples/UBayFS
    
 
 
