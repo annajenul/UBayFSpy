@@ -15,7 +15,6 @@ import sys
 sys.path.insert(0, os.path.abspath('../src/UBayFS/'))
 
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'UBayFS'
