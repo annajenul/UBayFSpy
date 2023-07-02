@@ -12,8 +12,7 @@ jobs:
         run: |
           pip install sphinx sphinx_rtd_theme
           pip install nbsphinx
-          conda install -c conda-forge pandoc
-          pip install --upgrade pandoc
+      - uses: docker://pandoc/core:2.9
       - name: Sphinx build
         run: |
           sphinx-build docs _build
