@@ -6,7 +6,7 @@
 Welcome to UBayFS's documentation!
 ==================================
 
-.. image:: logo.png
+.. image:: ../logo.png
    :width: 350
    :align: right
 
