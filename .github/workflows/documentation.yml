@@ -12,10 +12,12 @@ jobs:
         run: |
           pip install sphinx sphinx_rtd_theme
           pip install nbsphinx
-      - uses: docker://pandoc/core:2.9
       - name: Sphinx build
+        with:
+          pre-build-command: >-
+            apt-get update && apt-get install -y pandoc
         run: |
-          sphinx-build docs _build
+          sphinx-build docs _build  
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
