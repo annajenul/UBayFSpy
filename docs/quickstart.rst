@@ -12,7 +12,7 @@ UBayFS can be used for common feature selection and also for block feature selec
 
 Documentation
 -------------
-The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UBayFSpy/blob/main/examples/UBayFS.ipynb>`_ , illustrating the UBayFS workflow. 
+The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UBayFSpy/blob/main/docs/notebooks/UBayFS.ipynb>`_ , illustrating the UBayFS workflow. 
 
 Classification example
 ----------------------
