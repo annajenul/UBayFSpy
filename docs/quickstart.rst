@@ -9,11 +9,6 @@ cannot-link constraints (features must not be selected together). Using relaxed 
 Hence, violation of constraints can be valid but leads to a lower target value of the feature set that is derived from the violated constraints. 
 UBayFS can be used for common feature selection and also for block feature selection.
 
-
-Documentation
--------------
-The following Jupyter notebook provides a `classification example <https://github.com/annajenul/UBayFSpy/blob/main/docs/notebooks/UBayFS.ipynb>`_ , illustrating the UBayFS workflow. 
-
 Classification example
 ----------------------
 The following python example illustrates UBayFS on the Wisconsin breast cancer (classification) dataset, available from scikit-learn.
