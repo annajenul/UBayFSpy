@@ -367,8 +367,8 @@ class UBaymodel():
            
         Returns
         -----
-        - <pandas dataframe> with the optimal feature set and their names as index
-        - <list> of selected feature names
+            <pandas dataframe> with the optimal feature set and their names as index
+            <list> of selected feature names
         """
         # check if any constraint present:
         if len(self.constraints) == 0:

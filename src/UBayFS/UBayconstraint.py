@@ -146,7 +146,7 @@ class UBayconstraint():
         
     def get_dimensions(self):
         """
-        Get the dimensions of ...?
+        Get the dimensions of the constraint matrix A and the block matrix.
            
         Returns
         -----

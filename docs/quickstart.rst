@@ -28,13 +28,18 @@ example notebooks on the UBayFS GitHub repository.
     data = pd.read_csv("./data/data.csv")
     labels = pd.read_csv("./data/labels.csv").replace(("M","B"),(0,1)).astype(int)
 
-    model = UBaymodel(data=data,
-                 target = labels,
-                 feat_names = data.columns,
-                 weights = [0.01],
-                 M = 100, random_state=10,
-                 method=[ "mrmr"],
-                 nr_features = 20)
+    model = UBaymodel(data = data,
+                  target = labels,
+                  feat_names = data.columns,
+                  M = 100,tt_split = 0.75,
+                  nr_features = 10,
+                  method = ["mrmr"],
+                  weights = [0.01],l = 1,
+                  constraints = None,
+                  optim_method = "GA",
+                  popsize = 100,
+                  maxiter = 100,
+                  random_state = 0)
 
     constraints = UBayconstraint(rho=np.array([np.Inf, 0.1, 1, 1]), 
                              constraint_types=["max_size", "must_link", "cannot_link", "cannot_link"], 
