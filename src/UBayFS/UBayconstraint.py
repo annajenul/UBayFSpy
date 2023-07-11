@@ -10,7 +10,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from random import sample
 from sklearn.feature_selection import SelectKBest, chi2
-from skfeature.function.similarity_based import fisher_score
+#from skfeature.function.similarity_based import fisher_score
 from scipy.special import logsumexp
 import math
 import sys
@@ -76,10 +76,7 @@ class UBayconstraint():
             self.A = np.empty((0,num_elements), int)
             self.b = np.empty(0)
             self.rho = np.empty(0)
-            
-            # check if all constraint types in max, must, cannot
-            
-            # len constraint types must be len constraint vars
+
             
             def max_size(smax):
                 self.A = np.append(self.A, np.ones((1,num_elements)), axis=0)
@@ -104,7 +101,7 @@ class UBayconstraint():
                     self.b = np.append(self.b, 1)
                     
             # iterate over constraints
-            
+            # check if all constraint types in max, must, cannot
             for i, (cv, ct) in enumerate(zip(constraint_vars, constraint_types)):
                 if ct == "max_size":
                     max_size(cv)

@@ -10,7 +10,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from random import sample, seed
 from sklearn.feature_selection import SelectKBest, chi2
-from skfeature.function.similarity_based import fisher_score
 import mrmr
 import sys
 from scipy.special import logsumexp
@@ -75,7 +74,8 @@ class UBaymodel():
         
         self.data = pd.DataFrame(data)
         self.nrow, self.ncol = np.shape(data)
-        self.target = target.values if isinstance(target, pd.DataFrame) else target
+        target = target.values if isinstance(target, pd.DataFrame) else target
+        self.target = target[:,0] if len(np.shape(target)) == 2 else target # transform target to 1-d nparray
         self.M = M
         self.tt_split = tt_split
         self.method = method
@@ -122,7 +122,7 @@ class UBaymodel():
         for i in range(self.M):
             if self.binary == True:
                 train_data, _, train_labels, _ = train_test_split(self.data, self.target, 
-                                                           train_size=self.tt_split, stratify=target, random_state=self.random_state)
+                                                           train_size=self.tt_split, stratify=self.target, random_state=self.random_state)
                 
             else:
                 train_data, _, train_labels, _ = train_test_split(self.data, self.target, 
@@ -141,63 +141,37 @@ class UBaymodel():
                 self.nr_features = nr_features
                 
 
-            train_data = train_data.values
             if self.binary:
-                train_labels = train_labels[:,0].astype(int)
+                train_labels = train_labels.astype(int)
             else:
-                train_labels = train_labels[:,0].astype(float)
+                train_labels = train_labels.astype(float)
                 
             for m in self.method:
                 self.ensemble_fails = 0
                 try:
-                
-                    if m in ["mRMR", "mrmr"]:
+                    if callable(m):
+                        ranks = m(train_data.values, train_labels, self.nr_features)
+                        ranks = [self.nconst_feature_names[i] for i in ranks]
+                    elif m in ["mRMR", "mrmr"]:
                         if self.binary:
-                            ranks = mrmr.mrmr_classif(pd.DataFrame(train_data), train_labels, 
+                            ranks = mrmr.mrmr_classif(pd.DataFrame(train_data.values), train_labels, 
                                                       self.nr_features, show_progress=False)
                             
                         else:
-                            ranks = mrmr.mrmr_regression(pd.DataFrame(train_data), train_labels, 
+                            ranks = mrmr.mrmr_regression(pd.DataFrame(train_data.values), train_labels, 
                                                       self.nr_features, show_progress=True)
                         ranks = [self.nconst_feature_names[i] for i in ranks]
-                        name="mrmr"
-                        
-                    if m in ["chi"]:
-                        chi2_f = SelectKBest(chi2, k=self.nr_features)
-                        chi2_f.fit_transform(train_data, train_labels)
-                        ranks = chi2_f.get_feature_names_out()
-                        name="chi"
-                    if m in["fisher", "Fisher"]:
-                        if self.binary:
-                            self.td = train_data
-                            self.tl = train_labels
-                            ranks = fisher_score.fisher_score(train_data, 
-                                                              train_labels)
-                            self.ranks = ranks
-                            ranks = ranks[:self.nr_features]
-                            ranks = [self.nconst_feature_names[i] for i in ranks]
-                            
-                            name="fisher"
-                        else:
-                            sys.exit("Fisher score not usable for regression problems!")
+                       
                         
                     vec = pd.DataFrame(columns=self.feat_names)
                     vec.loc[0] = np.repeat(0, self.ncol)
                     vec.loc[:,ranks] = 1
-                    vec.index = [name + "_" + str(i)]
                     self.ensemble_matrix = pd.concat([self.ensemble_matrix,
                                                   vec], ignore_index=False)
                 except:
                     print("method not working for in this iteration...")
-                    #vec = pd.DataFrame(columns=self.feat_names)
-                    #vec.loc[0] = np.repeat(np.nan, self.ncol)
-                    #print(name + "_" + str(i))
-                    #vec.index = [name + "_" + str(i)]
                     self.ensemble_fails += 1
                 
-                
-
-        #self.ensemble_matrix = self.ensemble_matrix.dropna()
         
         if np.ceil(len(self.ensemble_matrix) / len(self.method)) < np.ceil(self.M / 2):
             sys.exit("Too many ensembles could not be performed!")
@@ -319,10 +293,6 @@ class UBaymodel():
         -----
         A list.
         """
-        #constraints = {}
-        #for i, constraint in enumerate(self.constraints):
-        #    constraints[i] = {"A":constraint.A, "b":constraint.b, "rho": constraint.rho, "block_matrix":constraint.block_matrix}
-        #return constraints
         return self.constraints    
         
     def admissibility(self, state, log=True):
