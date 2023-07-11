@@ -1,0 +1,227 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Validation on a simulated dataset &#8212; UBayFS 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Block feature selection with UBayFS" href="BFS_UBayFS.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BFS_UBayFS.html" title="Block feature selection with UBayFS"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UBayFS 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../examples.html" accesskey="U">Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Validation on a simulated dataset</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="Validation-on-a-simulated-dataset">
+<h1>Validation on a simulated dataset<a class="headerlink" href="#Validation-on-a-simulated-dataset" title="Permalink to this heading">¶</a></h1>
+<p>In this Jupyter notebook we evaluate if UBayFS selects the correct features in a simulated dataset where we know the ground truth. The dataset was simulated in <code class="docutils literal notranslate"><span class="pre">R</span></code> according to the script provided under <a class="reference external" href="https://github.com/annajenul/UBayFS_experiments/blob/main/Experiment_1/1_a_additive_classification.R">this link</a>.</p>
+<p>We simulate 30 features through a multivariate normal distribution, where each feature has mean 0 and standard deviation 1. The target <span class="math notranslate nohighlight">\(y\)</span> is generated through an additive model consisting of the first four features (<span class="math notranslate nohighlight">\(f_0,f_1,f_2,f_3\)</span>) plus some small error <span class="math notranslate nohighlight">\(\varepsilon \sim \mathcal{N}(0,1)\)</span>:</p>
+<p><span class="math notranslate nohighlight">\(y = -2\cdot \sin(2f_0) + f_1^2 + f_2 + \exp(-f_3) + \varepsilon\)</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import pandas as pd
+import numpy as np
+import seaborn as sns
+import sys
+import matplotlib.pyplot as plt
+sys.path.append(&quot;../../src/UBayFS&quot;)
+from UBaymodel import UBaymodel
+from UBayconstraint import UBayconstraint
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>data = pd.read_csv(&quot;./data/simulation/data.csv&quot;)
+labels = pd.read_csv(&quot;./data/simulation/labels.csv&quot;)
+</pre></div>
+</div>
+</div>
+<p>The correlation matrix shows that <span class="math notranslate nohighlight">\(f_0, f_2\)</span> and <span class="math notranslate nohighlight">\(f_3\)</span> have a higher correlation with the target compared to the remaining features. Feature <span class="math notranslate nohighlight">\(f_1\)</span> has a low correlation with the target even though it is part of the target generation. Hence, we cannot assume that UBayFS selects <span class="math notranslate nohighlight">\(f_1\)</span> with a higher probability than the remaining features. the four features with the highest absolute correlation with the target are <span class="math notranslate nohighlight">\(f_0, f_2, f_3,\)</span> and <span class="math notranslate nohighlight">\(f_{13}\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>plt.subplots(figsize=(20,15))
+data1 = data.copy()
+data1[&quot;target&quot;] = labels
+sns.heatmap(np.round(data1.corr(), 2), annot=True, xticklabels=True)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;AxesSubplot:&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Validation_Study_4_1.png" src="../_images/notebooks_Validation_Study_4_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model = UBaymodel(data=data,
+                 target = labels,
+                 feat_names = [],
+                 weights = [0.01],
+                 M = 30, random_state=10,
+                 method=[ &quot;mrmr&quot;],
+                 nr_features = 4,
+                 constraints = UBayconstraint(rho=np.array([np.Inf]),
+                             constraint_types=[&quot;max_size&quot;],
+                             constraint_vars=[4],
+                             num_elements=data.shape[1])
+)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>result = model.train()
+result[1]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;f0&#39;, &#39;f2&#39;, &#39;f3&#39;, &#39;f13&#39;]
+</pre></div></div>
+</div>
+<p>UBayFS with a max-size constraint of four features selects the expected features. Hence, this study shows that the method works well. By increasing the prior weight for feature <span class="math notranslate nohighlight">\(f_1\)</span> we can almost “force” the model to select the feature.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>weights = np.repeat(0.1,30)
+weights[1] = 100
+model.setWeights(weights)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>result = model.train()
+result[1]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;f0&#39;, &#39;f1&#39;, &#39;f2&#39;, &#39;f3&#39;]
+</pre></div></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="BFS_UBayFS.html"
+                          title="previous chapter">Block feature selection with UBayFS</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/notebooks/Validation Study.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="BFS_UBayFS.html" title="Block feature selection with UBayFS"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UBayFS 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../examples.html" >Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Validation on a simulated dataset</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Anna Jenul, Stefan Schrunner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>

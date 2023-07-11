@@ -1,0 +1,327 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>UBaymodel &#8212; UBayFS 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="UBay constraints" href="UBayconstraint.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UBayconstraint.html" title="UBay constraints"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UBayFS 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">UBaymodel</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="ubaymodel">
+<h1>UBaymodel<a class="headerlink" href="#ubaymodel" title="Permalink to this heading">¶</a></h1>
+<p>UBayFS</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">UBaymodel.</span></span><span class="sig-name descname"><span class="pre">UBaymodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tt_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['mrmr']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dirichlet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'GA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">popsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization of a UBaymodel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>&lt;numpy array&gt;</em><em> or </em><em>&lt;pandas dataframe&gt;</em>) – Dataset on which feature selection shall be performed.
+Variable types must be numeric or integer.</p></li>
+<li><p><strong>target</strong> (<em>&lt;numpy array&gt;</em><em> or </em><em>&lt;pandas dataframe&gt;</em>) – Response variable of data.
+Variable types must be numeric or integer.</p></li>
+<li><p><strong>feat_names</strong> (<em>&lt;list&gt;</em>) – List holding feature names. Preferably a list of string values.
+If empty, feature names will be generated automatically.
+Default: <code class="docutils literal notranslate"><span class="pre">feat_names=[]</span></code>.</p></li>
+<li><p><strong>M</strong> (<em>&lt;int&gt;</em>) – Positive integer determining the number of ensemble models. Default <code class="docutils literal notranslate"><span class="pre">M=100</span></code>.
+tt_split : &lt;float&gt;
+Ratio of samples used for training a single ensemble model. Default <code class="docutils literal notranslate"><span class="pre">tt_split=0.75</span></code>.</p></li>
+<li><p><strong>nr_features</strong> (<em>&lt;string</em><em> or </em><em>int&gt;</em>) – <dl class="simple">
+<dt>Number of features selected in a single ensemble. Default: <code class="docutils literal notranslate"><span class="pre">nr_features=&quot;auto&quot;</span></code>.</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">string=&quot;auto&quot;</span></code> : A random number between 1 and the total number of features.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span></code> : A positive integer.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>method</strong> (<em>&lt;list</em><em> of </em><em>strings&gt;</em>) – <dl class="simple">
+<dt>List of feature selectors used as ensemble feature selectors.Currently options are:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mrmr</span></code> : minimum Redundancy maximal Relevance criterion. This method supports classification and regression tasks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chi</span></code> : chi square whatever</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fisher</span></code> : Fisher score (classification only)</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>prior_model</strong> (<em>&lt;string&gt;</em>) – Type of prior. Default: <code class="docutils literal notranslate"><span class="pre">prior_model=&quot;dirichlet&quot;</span></code>. So far, “dirichlet” is the only implemented prior model type.</p></li>
+<li><p><strong>weights</strong> (<em>&lt;list&gt;</em>) – A list of integers defining the prior weights of the features. If a list with only one entry is used, this value is assigned to each feature as prior weight. Default: <code class="docutils literal notranslate"><span class="pre">weight=[1]</span></code></p></li>
+<li><p><strong>constraints</strong> (<em>&lt;UBayconstraint&gt;</em>) – A UBayconstraint object describing user-defined constraints. See description UBayconstraint. Default: <code class="docutils literal notranslate"><span class="pre">constraints=None</span></code></p></li>
+<li><p><strong>l</strong> (<em>&lt;float&gt;</em>) – Positive float. The Lagrange parameter defining the penalization strength imposed on a feature set violating the constraints. Default: <code class="docutils literal notranslate"><span class="pre">l=1</span></code></p></li>
+<li><p><strong>optim_method</strong> (<em>&lt;string&gt;</em>) – Optimizer. Currently only Genetic Algorithm “GA” available. Default: <code class="docutils literal notranslate"><span class="pre">optim_metod=&quot;GA&quot;</span></code></p></li>
+<li><p><strong>popsize</strong> (<em>&lt;integer&gt;</em>) – Positive integer for the population size in GA.</p></li>
+<li><p><strong>maxiter</strong> (<em>&lt;integer&gt;</em>) – Positive integer for the maximal number of GA iterations.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.admissibility">
+<span class="sig-name descname"><span class="pre">admissibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.admissibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get admissibility of a feature set.
+:param state: Binary 1-d array indicating which features are selected (1) and which are not selected (0).
+:type state: &lt;np.array&gt;
+:param log: Use of log-scale.
+:type log: &lt;boolean&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A numeric value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.evaluateFS">
+<span class="sig-name descname"><span class="pre">evaluateFS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spearman'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.evaluateFS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the UBaymodel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A &lt;dictionary&gt; with different key parameters of the selected feature set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.getConstraints">
+<span class="sig-name descname"><span class="pre">getConstraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.getConstraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get side constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.getOptim">
+<span class="sig-name descname"><span class="pre">getOptim</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.getOptim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get optimization parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with the optimization parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.getWeights">
+<span class="sig-name descname"><span class="pre">getWeights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.getWeights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get prior weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A numpy array with the prior weights.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.posteriorExpectation">
+<span class="sig-name descname"><span class="pre">posteriorExpectation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.posteriorExpectation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posterior expectation score.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A numeric value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.sampleInitial">
+<span class="sig-name descname"><span class="pre">sampleInitial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.sampleInitial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample an initial feature set based on a search heuristic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A binary &lt;numpy array&gt; feature set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.setConstraints">
+<span class="sig-name descname"><span class="pre">setConstraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.setConstraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set side oconstraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constraints</strong> (<em>&lt;UBayconstraint&gt;</em>) – A UBayconstraint object describing user-defined constraints. See description UBayconstraint.</p></li>
+<li><p><strong>append</strong> (<em>&lt;boolean&gt;</em>) – <ul>
+<li><p>True: Append a new constraint to the list of present constraints</p></li>
+<li><p>False: Replace all present constraints with the new constraint</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.setOptim">
+<span class="sig-name descname"><span class="pre">setOptim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optim_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">popsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.setOptim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set parameters for optimization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optim_method</strong> (<em>&lt;string&gt;</em>) – Currently only genetic algorithm (“GA”) possible.</p></li>
+<li><p><strong>popsize</strong> (<em>&lt;integer&gt;</em>) – Positive integer for the population size in GA.</p></li>
+<li><p><strong>maxiter</strong> (<em>&lt;integer&gt;</em>) – Positive integer for the maximal number of GA iterations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.setWeights">
+<span class="sig-name descname"><span class="pre">setWeights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.setWeights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set prior weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>&lt;list&gt;</em>) – A list of integers defining the prior weights of the features. If a list with only one entry is used, this value is assigned to each feature as prior weight.
+Block assignment information for features.</p></li>
+<li><p><strong>block_matrix</strong> (<em>&lt;np.array&gt;</em>) – Numpy array matrix definint the block assignment information for features.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="UBaymodel.UBaymodel.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#UBaymodel.UBaymodel.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the UBaymodel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>&lt;pandas dataframe&gt; with the optimal feature set and their names as index</em></p></li>
+<li><p><em>&lt;list&gt; of selected feature names</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">UBaymodel</a><ul>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel"><code class="docutils literal notranslate"><span class="pre">UBaymodel</span></code></a><ul>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.admissibility"><code class="docutils literal notranslate"><span class="pre">UBaymodel.admissibility()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.evaluateFS"><code class="docutils literal notranslate"><span class="pre">UBaymodel.evaluateFS()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.getConstraints"><code class="docutils literal notranslate"><span class="pre">UBaymodel.getConstraints()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.getOptim"><code class="docutils literal notranslate"><span class="pre">UBaymodel.getOptim()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.getWeights"><code class="docutils literal notranslate"><span class="pre">UBaymodel.getWeights()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.posteriorExpectation"><code class="docutils literal notranslate"><span class="pre">UBaymodel.posteriorExpectation()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.sampleInitial"><code class="docutils literal notranslate"><span class="pre">UBaymodel.sampleInitial()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.setConstraints"><code class="docutils literal notranslate"><span class="pre">UBaymodel.setConstraints()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.setOptim"><code class="docutils literal notranslate"><span class="pre">UBaymodel.setOptim()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.setWeights"><code class="docutils literal notranslate"><span class="pre">UBaymodel.setWeights()</span></code></a></li>
+<li><a class="reference internal" href="#UBaymodel.UBaymodel.train"><code class="docutils literal notranslate"><span class="pre">UBaymodel.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="quickstart.html"
+                          title="previous chapter">Quickstart</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="UBayconstraint.html"
+                          title="next chapter">UBay constraints</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/UBaymodel.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="UBayconstraint.html" title="UBay constraints"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UBayFS 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">UBaymodel</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Anna Jenul, Stefan Schrunner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>

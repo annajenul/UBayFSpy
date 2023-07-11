@@ -1,0 +1,722 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>A quick tour through UBayFS &#8212; UBayFS 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Block feature selection with UBayFS" href="BFS_UBayFS.html" />
+    <link rel="prev" title="Examples" href="../examples.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BFS_UBayFS.html" title="Block feature selection with UBayFS"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../examples.html" title="Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UBayFS 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../examples.html" accesskey="U">Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">A quick tour through UBayFS</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="A-quick-tour-through-UBayFS">
+<h1>A quick tour through UBayFS<a class="headerlink" href="#A-quick-tour-through-UBayFS" title="Permalink to this heading">¶</a></h1>
+<section id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this heading">¶</a></h2>
+<p>The UBayFS package implements the framework proposed in <a class="reference external" href="https://link.springer.com/article/10.1007/s10994-022-06221-9">Jenul et al. (2022)</a>. UBayFS is an ensemble feature selection technique embedded in a Bayesian statistical framework. The method combines data and user knowledge, where the first is extracted via data-driven ensemble feature selection. The user can control the feature selection by assigning prior weights to features and penalizing specific feature combinations. In particular,
+the user can define a maximum number of selected features and must-link constraints (features must be selected together) or cannot-link constraints (features must not be selected together). A parameter <span class="math notranslate nohighlight">\(\rho\)</span> regulates the shape of a penalty term accounting for side constraints, where feature sets that violate constraints lead to a lower target value.</p>
+<p>In this notebook, we use the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html">Breast Cancer Wisconsin dataset</a> for demonstration. Specifically, the dataset consists of 569 samples and 30 features. The dataset describes a classification problem, where the aim is to distinguish between malignant and benign cancer based on image data. Features are derived from 10 image characteristics, where each characteristic is represented by three features (summary
+statistics) in the dataset. For instance, the characteristic <em>radius</em> is represented by features <em>radius mean</em>, <em>radius standard deviation</em>, and <em>radius worst</em>.</p>
+</section>
+<section id="Requirements-and-dependencies">
+<h2>Requirements and dependencies<a class="headerlink" href="#Requirements-and-dependencies" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>numpy&gt;=1.23.5</p></li>
+<li><p>pandas&gt;=1.5.3</p></li>
+<li><p>scikit-learn&gt;=1.2.2</p></li>
+<li><p>scipy&gt;=1.10.0</p></li>
+<li><p>random</p></li>
+<li><p>sklearn-features&gt;=1.1.0</p></li>
+<li><p>mrmr&gt;=0.2.6</p></li>
+<li><p>pygad&gt;=3.0.1</p></li>
+<li><p>math</p></li>
+</ul>
+<p>To run UBayFS in Python we must import the classes UBaymodel and UBayconstraint.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import pandas as pd
+import numpy as np
+import sys
+sys.path.append(&quot;../../src/UBayFS&quot;)
+from UBaymodel import UBaymodel
+from UBayconstraint import UBayconstraint
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>data = pd.read_csv(&quot;./data/data.csv&quot;)
+labels = pd.read_csv(&quot;./data/labels.csv&quot;).replace((&quot;M&quot;,&quot;B&quot;),(0,1)).astype(int)
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Background">
+<h2>Background<a class="headerlink" href="#Background" title="Permalink to this heading">¶</a></h2>
+<p>This section summarizes the core parts of UBayFS, where a central part is Bayes’ Theorem for two random variables <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{y}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[p(\boldsymbol{\theta}|\boldsymbol{y})\propto p(\boldsymbol{y}|\boldsymbol{\theta})\cdot p(\boldsymbol{\theta}),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> represents an importance parameter of single features and <span class="math notranslate nohighlight">\(\boldsymbol{y}\)</span> collects evidence about <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> from an ensemble of elementary feature selectors. In the following, the concept will be outlined.</p>
+<section id="Ensemble-feature-selection-as-likelihood">
+<h3>Ensemble feature selection as likelihood<a class="headerlink" href="#Ensemble-feature-selection-as-likelihood" title="Permalink to this heading">¶</a></h3>
+<p>The first step in UBayFS is to build <span class="math notranslate nohighlight">\(M\)</span> ensembles of elementary feature selectors. Each elementary feature selector <span class="math notranslate nohighlight">\(m=1,\dots,M\)</span> selects features, denoted by a binary membership vector <span class="math notranslate nohighlight">\(\boldsymbol{\delta}^{(m)} \in \{0,1\}^N\)</span>, based on a randomly selected training dataset, where <span class="math notranslate nohighlight">\(N\)</span> denotes the total number of features in the dataset. In the binary membership vector <span class="math notranslate nohighlight">\(\boldsymbol{\delta}^{(m)}\)</span>, a component <span class="math notranslate nohighlight">\(\delta_i^{(m)}=1\)</span> indicates that feature
+<span class="math notranslate nohighlight">\(i\in\{1,\dots,N\}\)</span> is selected, and <span class="math notranslate nohighlight">\(\delta_i^{(m)}=0\)</span> otherwise. Statistically, we interpret the result from each elementary feature selector as a realization from a multinomial distribution with parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> and <span class="math notranslate nohighlight">\(l\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\in[0,1]^N\)</span> defines the success probabilities of sampling each feature in an individual feature selection and <span class="math notranslate nohighlight">\(l\)</span> corresponds to the number of features selected in <span class="math notranslate nohighlight">\(\boldsymbol{\delta}^{(m)}\)</span>.
+Therefore, the joint probability density of the observed data <span class="math notranslate nohighlight">\(\boldsymbol{y} = \sum\limits_{m=1}^{M}\boldsymbol{\delta}^{(m)}\in\{0,\dots,M\}^N\)</span> — the likelihood function — has the form</p>
+<div class="math notranslate nohighlight">
+\[p(\boldsymbol{y}|\boldsymbol{\theta}) = \prod\limits_{m=1}^{M} f_{\text{mult}}(\boldsymbol{\delta}^{(m)};\boldsymbol{\theta},l),\]</div>
+<p>where <span class="math notranslate nohighlight">\(f_{\text{mult}}\)</span> is the probability density function of the multinomial distribution.</p>
+</section>
+<section id="Expert-knowledge-as-prior">
+<h3>Expert knowledge as prior<a class="headerlink" href="#Expert-knowledge-as-prior" title="Permalink to this heading">¶</a></h3>
+<p>UBayFS includes two types of expert knowledge: prior feature weights and feature set constraints.</p>
+<section id="Prior-feature-weights">
+<h4>Prior feature weights<a class="headerlink" href="#Prior-feature-weights" title="Permalink to this heading">¶</a></h4>
+<p>To introduce expert knowledge about the importance of features, the user may define a vector <span class="math notranslate nohighlight">\(\boldsymbol{\alpha} = (\alpha_1,\dots,\alpha_N)\)</span>, <span class="math notranslate nohighlight">\(\alpha_i&gt;0\)</span> for all <span class="math notranslate nohighlight">\(i=1,\dots,N\)</span>, assigning a weight to each feature. High weights indicate that a feature is important. By default, if all features are equally important or no prior weighting is used, <span class="math notranslate nohighlight">\(\boldsymbol{\alpha}\)</span> is set to the 1-vector of length <span class="math notranslate nohighlight">\(N\)</span>. With the weighting in place, we assume the a-priori feature
+importance parameter <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> follows a Dirichlet distribution [&#64;R:DirichletReg]</p>
+<div class="math notranslate nohighlight">
+\[p(\boldsymbol{\theta}) = f_{\text{Dir}}(\boldsymbol{\theta};\boldsymbol{\alpha}),\]</div>
+<p>where the probability density function of the Dirichlet distribution is given as</p>
+<div class="math notranslate nohighlight">
+\[f_{\text{Dir}}(\boldsymbol{\theta};\boldsymbol{\alpha}) = \frac{1}{\text{B}(\boldsymbol{\alpha})} \prod\limits_{n=1}^N \theta_n^{\alpha_n-1},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{B}(.)\)</span> denotes the multivariate Beta function. Generalizations of the Dirichlet distribution [&#64;wong:gdirichlet,&#64;hankin:hyperdirichlet] are also implemented in UBayFS.</p>
+<p>Since the Dirichlet distribution is the conjugate prior with respect to a multivariate likelihood, the posterior density is given as</p>
+<div class="math notranslate nohighlight">
+\[p(\boldsymbol{\theta}|\boldsymbol{y}) \propto f_{\text{Dir}}(\boldsymbol{\theta};\boldsymbol{\alpha}^\circ),\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{\alpha}^\circ = \left( \alpha_1 + \sum\limits_{m=1}^M \delta_1^{(m)}, \dots, \alpha_N + \sum\limits_{m=1}^M \delta_N^{(m)}  \right)\]</div>
+<p>representing the posterior parameter vector <span class="math notranslate nohighlight">\(\boldsymbol{\alpha}^\circ\)</span>.</p>
+</section>
+<section id="Feature-set-constraints">
+<h4>Feature set constraints<a class="headerlink" href="#Feature-set-constraints" title="Permalink to this heading">¶</a></h4>
+<p>In addition to the prior weighting of features, the UBayFS user can also add different types of constraints to the feature selection:</p>
+<ul class="simple">
+<li><p><em>max-size constraint</em>: Maximum number of features that shall be selected.</p></li>
+<li><p><em>must-link constraint</em>: For a pair of features, either both or none is selected (defined as pairwise constraints, one for each pair of features).</p></li>
+<li><p><em>cannot-link constraint</em>: Used if a pair of features must not be selected jointly.</p></li>
+</ul>
+<p>All constraints can be defined <em>block-wise</em> between feature blocks (instead of individual features). Constraints are represented as a linear system of linear inequalities <span class="math notranslate nohighlight">\(\boldsymbol{A}\boldsymbol{\delta}-\boldsymbol{b}\leq \boldsymbol{0}\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol{A}\in\mathbb{R}^{K\times N}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{b}\in\mathbb{R}^K\)</span>. <span class="math notranslate nohighlight">\(K\)</span> denotes the total number of constraints. For constraint <span class="math notranslate nohighlight">\(k \in 1,..,K\)</span>, a feature set <span class="math notranslate nohighlight">\(\boldsymbol{\delta}\)</span> is admissible only if
+<span class="math notranslate nohighlight">\(\left(\boldsymbol{a}^{(k)}\right)^T\boldsymbol{\delta} - b^{(k)} \leq 0\)</span>, leading to the inadmissibility function (penalty term)</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\kappa_{k,\rho}(\boldsymbol{\delta}) = \left\{
+    \begin{array}{l l}
+    0 &amp; \text{if}~\left(\boldsymbol{a}^{(k)}\right)^T\boldsymbol{\delta}\leq b^{(k)}\\
+    1 &amp; \text{if}~ \left(\boldsymbol{a}^{(k)}\right)^T\boldsymbol{\delta}&gt; b^{(k)} \land \rho =\infty\\
+    \frac{1-\xi_{k,\rho}}{1 + \xi_{k,\rho}} &amp; \text{otherwise},
+    \end{array}
+    \right.\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\rho\in\mathbb{R}^+ \cup \{\infty\}\)</span> denotes a relaxation parameter and <span class="math notranslate nohighlight">\(\xi_{k,\rho} = \exp\left(-\rho \left(\left( \boldsymbol{a}^{(k)}\right)^T\boldsymbol{\delta} - b^{(k)}\right)\right)\)</span> defines the exponential term of a logistic function. To handle <span class="math notranslate nohighlight">\(K\)</span> different constraints for one feature selection problem, the joint inadmissibility function is given as</p>
+<div class="math notranslate nohighlight">
+\[\kappa(\boldsymbol{\delta})
+   = 1 - \prod\limits_{k=1}^{K} \left(1 -\kappa_{k,\rho}(\boldsymbol{\delta})\right)\]</div>
+<p>which originates from the idea that <span class="math notranslate nohighlight">\(\kappa = 1\)</span> (maximum penalization) if at least one <span class="math notranslate nohighlight">\(\kappa_{k,\rho}=1\)</span>, while <span class="math notranslate nohighlight">\(\kappa=0\)</span> (no penalization) if all <span class="math notranslate nohighlight">\(\kappa_{k,\rho}=0\)</span>.</p>
+<p>To obtain an optimal feature set <span class="math notranslate nohighlight">\(\boldsymbol{\delta}^\star\)</span>, we use a target function <span class="math notranslate nohighlight">\(U(\boldsymbol{\delta}, \boldsymbol{\theta})\)</span> which represents a posterior expected utility of feature sets <span class="math notranslate nohighlight">\(\boldsymbol{\delta}\)</span> given the posterior feature importance parameter <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>, regularized by the inadmissibility function <span class="math notranslate nohighlight">\(\kappa(.)\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E}_{\boldsymbol{\theta}|\boldsymbol{y}}[U(\boldsymbol{\delta}, \boldsymbol{\theta}(\boldsymbol{y}))] = \boldsymbol{\delta}^T \mathbb{E}_{\boldsymbol{\boldsymbol{\delta}}|\boldsymbol{y}}[\boldsymbol{\theta}(\boldsymbol{y})]-\lambda\kappa(\boldsymbol{\delta})\longrightarrow \underset{\boldsymbol{\delta}\in\{0,1\}^N}{\text{arg max}}\]</div>
+<p>Since an exact optimization is impossible due to the non-linear function <span class="math notranslate nohighlight">\(\kappa\)</span>, we use a genetic algorithm to find an appropriate feature set. In detail, the genetic algorithm is initialized via a Greedy algorithm and computes combinations of the given feature sets with regard to a fitness function in each iteration.</p>
+</section>
+</section>
+</section>
+<section id="Application-of-UBayFS">
+<h2>Application of UBayFS<a class="headerlink" href="#Application-of-UBayFS" title="Permalink to this heading">¶</a></h2>
+<section id="Ensemble-Training">
+<h3>Ensemble Training<a class="headerlink" href="#Ensemble-Training" title="Permalink to this heading">¶</a></h3>
+<p>The class <code class="docutils literal notranslate"><span class="pre">UBaymodel()</span></code> initializes the UBayFS model and trains an ensemble of elementary feature selectors. The training dataset and target are initialized with the arguments <code class="docutils literal notranslate"><span class="pre">data</span></code> and <code class="docutils literal notranslate"><span class="pre">target</span></code>. Although the UBayFS concept permits unsupervised, multiclass, or regression setups, the current implementation supports binary target and regression variables only. While <code class="docutils literal notranslate"><span class="pre">M</span></code> defines the ensemble size (number of elementary feature selectors), the types of the elementary feature selectors is set
+via <code class="docutils literal notranslate"><span class="pre">method</span></code>. The mRMR feature selector is implemented as baseline and can be called directlz with “mrmr”. In general, the <code class="docutils literal notranslate"><span class="pre">method</span></code> argument allows for each self-implemented feature selection function with the arguments <code class="docutils literal notranslate"><span class="pre">X</span></code> (numpy array describing the data), <code class="docutils literal notranslate"><span class="pre">y</span></code> (numpy array describing the target), and <code class="docutils literal notranslate"><span class="pre">n</span></code> (describing the number of features that shall be selected. The function must return the indices of the selected features. Some examples are shown below.</p>
+<p>Each ensemble model is trained on a random subset comprising <code class="docutils literal notranslate"><span class="pre">tt_split</span></code><span class="math notranslate nohighlight">\(\cdot 100\)</span> percent of the train data. Using the argument <code class="docutils literal notranslate"><span class="pre">prior_model</span></code> the user specifies whether the standard Dirichlet distribution or a generalized variant should be used as prior model. Furthermore, the number of features selected in each ensemble can be controlled by the parameter <code class="docutils literal notranslate"><span class="pre">nr_features</span></code>.</p>
+<p>The class <code class="docutils literal notranslate"><span class="pre">UBayconstraint</span></code> provides an easy way to define side constraints for the model. The generated object can be easily added to the UBaymodel by assigning it to the argument <code class="docutils literal notranslate"><span class="pre">constraints</span></code> which is by default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>For the standard UBayFS initialization, all prior feature weights are set to 0.01, and only the required <code class="docutils literal notranslate"><span class="pre">max_size</span></code> constraint is included. Ensemble counts indicate how often a feature was selected over the ensemble feature selections.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model = UBaymodel(data = data,
+                  target = labels,
+                  feat_names = data.columns,
+                  M = 100,tt_split = 0.75,
+                  nr_features = 10,
+                  method = [&quot;mrmr&quot;],
+                  weights = [0.01],l = 1,
+                  constraints = UBayconstraint(rho=np.array([1]),
+                                               constraint_types=[&quot;max_size&quot;],
+                                               constraint_vars=[3],
+                                               num_elements=data.shape[1]),
+                  optim_method = &quot;GA&quot;,
+                  popsize = 100,
+                  maxiter = 100,
+                  random_state = 0)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>np.shape(model.getWeights())
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(30,)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pd.DataFrame(np.stack([np.sum(model.ensemble_matrix, axis=0), model.getWeights()], axis=0),
+             columns = model.feat_names, index = [&quot;ensemble count&quot;, &quot;prior weight&quot;])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean.radius</th>
+      <th>mean.texture</th>
+      <th>mean.perimeter</th>
+      <th>mean.area</th>
+      <th>mean.smoothness</th>
+      <th>mean.compactness</th>
+      <th>mean.concavity</th>
+      <th>mean.concave.points</th>
+      <th>mean.symmetry</th>
+      <th>mean.fractal.dimension</th>
+      <th>...</th>
+      <th>worst.radius</th>
+      <th>worst.texture</th>
+      <th>worst.perimeter</th>
+      <th>worst.area</th>
+      <th>worst.smoothness</th>
+      <th>worst.compactness</th>
+      <th>worst.concavity</th>
+      <th>worst.concave.points</th>
+      <th>worst.symmetry</th>
+      <th>worst.fractal.dimension</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ensemble count</th>
+      <td>100</td>
+      <td>0</td>
+      <td>100</td>
+      <td>100</td>
+      <td>0</td>
+      <td>0</td>
+      <td>100</td>
+      <td>100</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>100</td>
+      <td>0</td>
+      <td>100</td>
+      <td>100</td>
+      <td>0</td>
+      <td>0</td>
+      <td>98</td>
+      <td>100</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>prior weight</th>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>...</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 30 columns</p>
+</div></div>
+</div>
+<p>In addition to <code class="docutils literal notranslate"><span class="pre">mrmr</span></code>, we add a function <code class="docutils literal notranslate"><span class="pre">decision_tree()</span></code>, that computes features based on decision tree importances.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from sklearn.tree import DecisionTreeClassifier
+def decision_tree(X,y,n):
+    clf = DecisionTreeClassifier()
+    clf.fit(X, y)
+
+    feat_importance = clf.tree_.compute_feature_importances(normalize=False)
+    return np.flip(np.argsort(feat_importance))[:n]
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model = UBaymodel(data = data,
+                  target = labels,
+                  feat_names = data.columns,
+                  M = 100,tt_split = 0.75,
+                  nr_features = 10,
+                  method = [&quot;mrmr&quot;, decision_tree],
+                  weights = [0.01],l = 1,
+                  constraints = UBayconstraint(rho=np.array([1]),
+                                               constraint_types=[&quot;max_size&quot;],
+                                               constraint_vars=[3],
+                                               num_elements=data.shape[1]),
+                  optim_method = &quot;GA&quot;,
+                  popsize = 100,
+                  maxiter = 100,
+                  random_state = 0)
+</pre></div>
+</div>
+</div>
+<p>Examples for more feature selection methods are:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># mrmr (is already implemented as baseline - this code is just to illustrate the concept of using own functions)
+import mrmr
+def mrmr_fs(X,y,n):
+    ranks = mrmr.mrmr_classif(pd.DataFrame(X), y, n, show_progress=False)
+    return ranks
+
+# recursive feature elimination with logistic regression classifier
+from sklearn.feature_selection import RFECV
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold
+
+def rfe(X,y,n):
+
+    clf = LogisticRegression()
+    cv = StratifiedKFold(5)
+
+    rfecv = RFECV(
+        estimator=clf,
+        step=1,
+        cv=cv,
+        scoring=&quot;accuracy&quot;,
+        min_features_to_select=n,
+    )
+    rfecv.fit(X, y)
+    return np.where(rfecv.ranking_==1)[0]
+
+# RENT feature selection with default setup - n is not used in this method
+from RENT import RENT
+
+def RENT_fs(X,y,n):
+    my_C_params = [0.1, 1]
+    my_l1_ratios = [0.5, 0.9]
+
+    model = RENT.RENT_Classification(data=pd.DataFrame(X),
+                                     target=y,
+                                     C=my_C_params,
+                                     l1_ratios=my_l1_ratios)
+    model.train()
+    selected_features = model.select_features()
+    return selected_features
+</pre></div>
+</div>
+</div>
+</section>
+<section id="User-knowledge">
+<h3>User knowledge<a class="headerlink" href="#User-knowledge" title="Permalink to this heading">¶</a></h3>
+<p>Using the function <code class="docutils literal notranslate"><span class="pre">setWeights()</span></code> the user is able to change the feature weights from the standard initialization to desired values. In our example, we assign equal weights to features originating from the same image characteristic. Weights can be on an arbitrary scale. As it is difficult to specify prior weights in real-life applications, we suggest to define them on a normalized scale.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>weights = np.tile(np.array([10,15,20,16,15,10,12,17,21,14]),3)
+strength = 1
+weights = weights * strength / np.sum(weights)
+model.setWeights(weights)
+</pre></div>
+</div>
+</div>
+<p>In addition to prior weights, feature set constraints may be specified. Internally, constraints are implemented via the class <code class="docutils literal notranslate"><span class="pre">UBayconstraint</span></code>. The input <code class="docutils literal notranslate"><span class="pre">rho</span></code> corresponds to the relaxation parameter of the admissibility function. Further, <code class="docutils literal notranslate"><span class="pre">constraint_types</span></code> consists of a list, where all constraint types are defined. Then, with <code class="docutils literal notranslate"><span class="pre">constraint_vars</span></code>, the user specifies details about the constraint: for max-size, the number of features to select is provided, while for must-link and
+cannot-link, the list of feature indices to be linked must be provided. Each list entry corresponds to one constraint in <code class="docutils literal notranslate"><span class="pre">constraint_types</span></code>. For block constraints, information about the block structure is included either with <code class="docutils literal notranslate"><span class="pre">block_list</span></code>or <code class="docutils literal notranslate"><span class="pre">block_matrix</span></code> - if both arguments are <code class="docutils literal notranslate"><span class="pre">None</span></code>, feature-wise constraints are generated.</p>
+<p>Applying <code class="docutils literal notranslate"><span class="pre">get_constraints()</span></code> demonstrates that, the matrix <code class="docutils literal notranslate"><span class="pre">A</span></code> has ten rows to represent four constraints. While <em>max-size</em> and <em>cannot-link</em> can be expressed in one equation each, <em>must-link</em> is a pairwise constraint. In specific, the <em>must-link</em> constraint between <span class="math notranslate nohighlight">\(n\)</span> features produces <span class="math notranslate nohighlight">\(\frac{n!}{(n-2)!}\)</span> elementary constraints. Hence, six equations represent the <em>must-link</em> constraint. The <code class="docutils literal notranslate"><span class="pre">UBaymodel</span></code>function <code class="docutils literal notranslate"><span class="pre">setConstraints()</span></code> integrates the constraints into the UBayFS
+model. With the argument <code class="docutils literal notranslate"><span class="pre">append=True</span></code>, the constraints are added to existing constraints. Otherwise the constraints are overwritten. In this case we define a new <code class="docutils literal notranslate"><span class="pre">max_size</span></code> constraint and overwrite the old one.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>constraints = UBayconstraint(rho=np.array([np.Inf, 0.1, 1, 1]),
+                             constraint_types=[&quot;max_size&quot;, &quot;must_link&quot;, &quot;cannot_link&quot;, &quot;cannot_link&quot;],
+                             constraint_vars=[10, [0,10,20], [0,9], [19,22,23]],
+                             num_elements=data.shape[1])
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model.setConstraints(constraints, append=False)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>constraints.get_constraints()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;A&#39;: array([[ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,
+          1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,
+          1.,  1.,  1.,  1.],
+        [ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.],
+        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+          0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  1.,  1.,  0.,  0.,
+          0.,  0.,  0.,  0.]]),
+ &#39;b&#39;: array([10.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  1.]),
+ &#39;rho&#39;: array([inf, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 1. , 1. ]),
+ &#39;block_matrix&#39;: array([[1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0.],
+        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1.]])}
+</pre></div></div>
+</div>
+</section>
+<section id="Optimization-and-evaluation">
+<h3>Optimization and evaluation<a class="headerlink" href="#Optimization-and-evaluation" title="Permalink to this heading">¶</a></h3>
+<p>A genetic algorithm, described by [&#64;givens:compstat], searches for the optimal feature set in the UBayFS framework. Using <code class="docutils literal notranslate"><span class="pre">setOptim()</span></code> we update the genetic algorithm parameters. Furthermore, <code class="docutils literal notranslate"><span class="pre">popsize</span></code> indicates the number of candidate feature sets created in each iteration, and <code class="docutils literal notranslate"><span class="pre">maxiter</span></code> is the number of iterations.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model.setOptim(optim_method=&quot;GA&quot;,
+               popsize=100,
+               maxiter=200)
+</pre></div>
+</div>
+</div>
+<p>At this point, we have initialized prior weights, constraints, and the optimization procedure — we can now train the UBayFS model using the function <code class="docutils literal notranslate"><span class="pre">train()</span></code>, relying on a genetic algorithm.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>result = model.train()
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>result[1]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;mean.radius&#39;,
+ &#39;mean.area&#39;,
+ &#39;mean.concave.points&#39;,
+ &#39;radius.error&#39;,
+ &#39;area.error&#39;,
+ &#39;worst.radius&#39;,
+ &#39;worst.area&#39;,
+ &#39;worst.concavity&#39;,
+ &#39;worst.concave.points&#39;,
+ &#39;worst.fractal.dimension&#39;]
+</pre></div></div>
+</div>
+<p>After training the model, we receive a feature selection result. The final feature set and its additional properties can be evaluated with <code class="docutils literal notranslate"><span class="pre">evaluateFS()</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>model.evaluateFS(result[0].values[:,0])
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;cardinality&#39;: 10,
+ &#39;total utility&#39;: 0.567,
+ &#39;posterior feature utility&#39;: 0.567,
+ &#39;admissibility&#39;: 1.0,
+ &#39;number of violated constraints&#39;: 0,
+ &#39;average feature correlation&#39;: 0.643}
+</pre></div></div>
+</div>
+<p>The output contains the following information:</p>
+<ul class="simple">
+<li><p><strong>cardinality</strong>: number of selected features</p></li>
+<li><p><strong>log total utility</strong>: value of the target function for optimization</p></li>
+<li><p><strong>log posterior feature utility</strong>: cumulated importances of selected features before substracting a penalization term</p></li>
+<li><p><strong>log admissibility</strong>: if 0, all constraints are fulfilled, otherwise at least one constraint is violated</p></li>
+<li><p><strong>number violated constraints</strong>: number of violated constraints</p></li>
+<li><p><strong>avg feature correlation</strong>: average correlation between features in dataset</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">A quick tour through UBayFS</a><ul>
+<li><a class="reference internal" href="#Introduction">Introduction</a></li>
+<li><a class="reference internal" href="#Requirements-and-dependencies">Requirements and dependencies</a></li>
+<li><a class="reference internal" href="#Background">Background</a><ul>
+<li><a class="reference internal" href="#Ensemble-feature-selection-as-likelihood">Ensemble feature selection as likelihood</a></li>
+<li><a class="reference internal" href="#Expert-knowledge-as-prior">Expert knowledge as prior</a><ul>
+<li><a class="reference internal" href="#Prior-feature-weights">Prior feature weights</a></li>
+<li><a class="reference internal" href="#Feature-set-constraints">Feature set constraints</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Application-of-UBayFS">Application of UBayFS</a><ul>
+<li><a class="reference internal" href="#Ensemble-Training">Ensemble Training</a></li>
+<li><a class="reference internal" href="#User-knowledge">User knowledge</a></li>
+<li><a class="reference internal" href="#Optimization-and-evaluation">Optimization and evaluation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../examples.html"
+                          title="previous chapter">Examples</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="BFS_UBayFS.html"
+                          title="next chapter">Block feature selection with UBayFS</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/notebooks/UBayFS.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="BFS_UBayFS.html" title="Block feature selection with UBayFS"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../examples.html" title="Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UBayFS 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../examples.html" >Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">A quick tour through UBayFS</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Anna Jenul, Stefan Schrunner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>

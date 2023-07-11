@@ -1,0 +1,168 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Quickstart &#8212; UBayFS 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="UBaymodel" href="UBaymodel.html" />
+    <link rel="prev" title="Welcome to UBayFS’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UBaymodel.html" title="UBaymodel"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to UBayFS’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UBayFS 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Quickstart</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h1>
+<p>The UBayFSpy package implements the framework proposed in the article [Jenul et al. (2022)](<a class="reference external" href="https://link.springer.com/article/10.1007/s10994-022-06221-9">https://link.springer.com/article/10.1007/s10994-022-06221-9</a>). UBayFS is an ensemble feature selection technique
+embedded in a Bayesian statistical framework. The method combines data and user knowledge, where the first is extracted via data-driven ensemble feature selection.
+The user can control the feature selection by assigning prior weights to features and penalizing specific feature combinations.
+In particular, the user can define a maximal number of selected features and must-link constraints (features must be selected together) or
+cannot-link constraints (features must not be selected together). Using relaxed constraints, a parameter $\rho$ regulates the penalty shape.
+Hence, violation of constraints can be valid but leads to a lower target value of the feature set that is derived from the violated constraints.
+UBayFS can be used for common feature selection and also for block feature selection.</p>
+<section id="classification-example">
+<h2>Classification example<a class="headerlink" href="#classification-example" title="Permalink to this heading">¶</a></h2>
+<p>The following python example illustrates UBayFS on the Wisconsin breast cancer (classification) dataset, available from scikit-learn.
+First, we load and prepare the data. Then we initialize a UBayFS model. This example shows
+how to select features with UBayFS. For more examples including block feature selection have a look at the
+example notebooks on the UBayFS GitHub repository.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">UBayFS</span>
+
+<span class="kn">from</span> <span class="nn">UBaymodel</span> <span class="kn">import</span> <span class="n">UBaymodel</span>
+<span class="kn">from</span> <span class="nn">UBayconstraint</span> <span class="kn">import</span> <span class="n">UBayconstraint</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/data.csv&quot;</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/labels.csv&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">((</span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="s2">&quot;B&quot;</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">UBaymodel</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span>
+              <span class="n">target</span> <span class="o">=</span> <span class="n">labels</span><span class="p">,</span>
+              <span class="n">feat_names</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+              <span class="n">M</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span><span class="n">tt_split</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+              <span class="n">nr_features</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+              <span class="n">method</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mrmr&quot;</span><span class="p">],</span>
+              <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">],</span><span class="n">l</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+              <span class="n">constraints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">optim_method</span> <span class="o">=</span> <span class="s2">&quot;GA&quot;</span><span class="p">,</span>
+              <span class="n">popsize</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+              <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+              <span class="n">random_state</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">constraints</span> <span class="o">=</span> <span class="n">UBayconstraint</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">Inf</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+                         <span class="n">constraint_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;max_size&quot;</span><span class="p">,</span> <span class="s2">&quot;must_link&quot;</span><span class="p">,</span> <span class="s2">&quot;cannot_link&quot;</span><span class="p">,</span> <span class="s2">&quot;cannot_link&quot;</span><span class="p">],</span>
+                         <span class="n">constraint_vars</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">19</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">23</span><span class="p">]],</span>
+                         <span class="n">num_elements</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">setConstraints</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Quickstart</a><ul>
+<li><a class="reference internal" href="#classification-example">Classification example</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Welcome to UBayFS’s documentation!</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="UBaymodel.html"
+                          title="next chapter">UBaymodel</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/quickstart.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="UBaymodel.html" title="UBaymodel"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to UBayFS’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UBayFS 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Quickstart</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Anna Jenul, Stefan Schrunner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    </div>
+  </body>
+</html>
