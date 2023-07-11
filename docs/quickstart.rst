@@ -5,7 +5,7 @@ The UBayFSpy package implements the framework proposed in the article [Jenul et 
 embedded in a Bayesian statistical framework. The method combines data and user knowledge, where the first is extracted via data-driven ensemble feature selection. 
 The user can control the feature selection by assigning prior weights to features and penalizing specific feature combinations. 
 In particular, the user can define a maximal number of selected features and must-link constraints (features must be selected together) or 
-cannot-link constraints (features must not be selected together). Using relaxed constraints, a parameter $\rho$ regulates the penalty shape. 
+cannot-link constraints (features must not be selected together). Using relaxed constraints, a parameter $\\rho$ regulates the penalty shape. 
 Hence, violation of constraints can be valid but leads to a lower target value of the feature set that is derived from the violated constraints. 
 UBayFS can be used for common feature selection and also for block feature selection.
 
