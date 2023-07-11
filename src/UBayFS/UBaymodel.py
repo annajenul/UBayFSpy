@@ -122,11 +122,11 @@ class UBaymodel():
         for i in range(self.M):
             if self.binary == True:
                 train_data, _, train_labels, _ = train_test_split(self.data, self.target, 
-                                                           train_size=self.tt_split, stratify=self.target, random_state=self.random_state)
+                                                           train_size=self.tt_split, stratify=self.target, random_state=i)
                 
             else:
                 train_data, _, train_labels, _ = train_test_split(self.data, self.target, 
-                                                           train_size=self.tt_split, random_state=self.random_state)
+                                                           train_size=self.tt_split, random_state=i)
             # non constant columns
             nconst_cols = np.where(train_data.nunique() != 1)[0]
             self.nconst_cols = nconst_cols
@@ -310,12 +310,11 @@ class UBaymodel():
         A numeric value.
         """
         adm = 1-log
-
         for i in self.constraints:
             if log:
-                adm = adm + i.group_admissibility(state)
+                adm = adm + i.group_admissibility(state, log=log)
             else:
-                adm = adm * i.group_admissibility(state)
+                adm = adm * i.group_admissibility(state, log=log)
         return adm
         
     def posteriorExpectation(self):
@@ -348,7 +347,7 @@ class UBaymodel():
         theta = self.posteriorExpectation()
         
         def fitness_fun(ga_instance, solution, solution_idx):
-            return logsumexp(np.array(theta[solution==1] + [np.log(self.l) + self.admissibility(solution)]))
+            return logsumexp(np.array(list(theta[solution==1]) + [np.log(self.l) + self.admissibility(solution)]))
         
         x_start = self.sampleInitial(post_scores = np.exp(theta), size=self.popsize)
         ga_instance = GA(num_generations = self.maxiter,
@@ -471,9 +470,10 @@ class UBaymodel():
         
         # posterior scores
         post_scores = self.posteriorExpectation()
-        log_post = logsumexp(post_scores[state == 1])
         
-        neg_loss = np.exp(logsumexp(np.array(post_scores[state==1] + [np.log(self.l) + self.admissibility(state)]))) - \
+        log_post = logsumexp(post_scores[state == 1]) if any(state == 1) else -np.Inf
+
+        neg_loss = np.exp(logsumexp(np.array(list(post_scores[state==1]) + [np.log(self.l) + self.admissibility(state, log=True)]))) - \
             self.l
         if log:
             neg_loss = np.log(neg_loss)

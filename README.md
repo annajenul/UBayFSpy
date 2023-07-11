@@ -16,7 +16,6 @@ Requirements and Dependencies
 - scikit-learn>=1.2.2
 - scipy>=1.10.0
 - random
-- sklearn-features>=1.1.0
 - mrmr>=0.2.6
 - pygad>=3.0.1
 - math
